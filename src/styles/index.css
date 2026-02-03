@@ -1,0 +1,93 @@
+/*! APP CSS */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+nav {
+    width: 100%;
+    color: white;
+    background-color: #222121;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #b4a8a8a5;
+}
+
+button {
+    background-color: #444343;
+    align-items: center;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 100px;
+    height: 40px;
+}
+
+/*! LOGIN CSS  */
+.modal-fondo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.65);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-caja {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    width: 320px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.btn-login {
+    width: 100%;
+    margin-top: 15px;
+    padding: 10px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+}
+
+.error {
+    color: red;
+    font-size: 0.8rem;
+}
+
+.link {
+    margin-top: 10px;
+    color: blue;
+    cursor: pointer;
+    text-align: center;
+}
+
+
+/*! Footer css  */
+footer {
+    background-color: #222121;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
