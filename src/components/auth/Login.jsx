@@ -1,20 +1,16 @@
 import { useState } from "react";
-import { auth, db } from "../DB/firebase";
-import {
-    createUserWithEmailAndPassword, signInWithEmailAndPassword
-} from "firebase/auth";
-import { setDoc, doc } from "firebase/firestore";
+import { login, register } from "../../services/auth.service";
 
 export default function LoginPopUp() {
     const [modoRegistro, setModoRegistro] = useState(false);
     const [nombre, setNombre] = useState("");
     const [email, setEmail] = useState("");
     const [pass, setPass] = useState("");
-    const [error, setError] = useState("");
+    const [error, setError] = useState(null);
 
     const hacerLogin = async () => {
         try {
-            await signInWithEmailAndPassword(auth, email, pass);
+            await login(email, pass);
         } catch (e) {
             setError(e.message);
             alert("Error al iniciar sesión: " + e.message);
@@ -23,15 +19,7 @@ export default function LoginPopUp() {
 
     const hacerRegistro = async () => {
         try {
-            const cred = await createUserWithEmailAndPassword(auth, email, pass);
-
-            await setDoc(doc(db, "users", cred.user.uid), {
-                nombre: nombre,
-                rol: email === "benjamengarelli@gmail.com"? "admin" : 
-                "usuario" // rol por defecto
-            });
-            console.log("Usuario registrado con UID:", cred.user.uid);
-
+            await register(nombre, email, pass);
         } catch (e) {
             setError(e.message);
             alert("Error al registrar usuario: " + e.message);
@@ -72,7 +60,7 @@ export default function LoginPopUp() {
                         placeholder="Contraseña"
                         value={pass}
                         onChange={(e) => setPass(e.target.value)}
-                        required min={6} max={12}
+                        required minLength={6} maxLength={12}
                     />
 
                     {error && <p className="error">{error}</p>}
