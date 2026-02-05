@@ -1,141 +1,111 @@
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
+import { useAuth } from "../../context/AuthContext";
+import { db } from "../../services/firebase";
+import { collection, addDoc } from "firebase/firestore";
+import { distanciaEntreCoordenadas, formatearTiempo, obtenerTiempoActualEnSegundos  }  from "../../helpers/time.helpers";
 
-export function User() {
-    // funciones timer
+const COORDENADAS_CLUB = {
+    latitud: -31.369203,
+    longitud: -64.240521
+};
+
+const DISTANCIA_MAX = 300; // en metros
+
+export default function User() {
+    const { user } = useAuth();
+    const [inicioTs, setInicioTs] = useState(
+        localStorage.getItem("inicioTs")
+            ? Number(localStorage.getItem("inicioTs"))
+            : null
+    );
+
+    const [tiempo, setTiempo] = useState(0);
+    const [distancia, setDistancia] = useState(null);
+
+
+    // Actualizar el tiempo transcurrido cada segundo // Se reinicia al cambiar inicioTs(cambio jornada)
+    useEffect(() => {
+        if (!inicioTs) return;
+
+        const intervalo = setInterval(() => {
+            setTiempo(Date.now() - inicioTs);
+        }, 1000);
+
+        return () => clearInterval(intervalo);
+    }, [inicioTs]);
+
+    // obtener ubicacion y calcular distancia
+    const obtenerUbicacion = () => {
+        return new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject, {enableHighAccuracy: true});
+        });
+    };
+
+    // Iniciar jornada
+    const iniciarJornada = async () => {
+        const ts = Date.now();
+        setInicioTs(ts);
+        localStorage.setItem("inicioTs", ts);
+        const pos = await obtenerUbicacion();
+        const distanciaActual = distanciaEntreCoordenadas(
+            pos.coords.latitude,
+            pos.coords.longitude,
+            COORDENADAS_CLUB.latitud,
+            COORDENADAS_CLUB.longitud
+        );
+        
+        const flagDistancia = distanciaActual > DISTANCIA_MAX ? "1" : "0";
+        localStorage.setItem("flagDistancia", flagDistancia);
+    };
+
+    // Finalizar jornada
+    const finalizarJornada = async () => {
+        const finTs = Date.now();
+        const pos = await obtenerUbicacion();
+        const distanciaActual = distanciaEntreCoordenadas(
+            pos.coords.latitude,
+            pos.coords.longitude,
+            COORDENADAS_CLUB.latitud,
+            COORDENADAS_CLUB.longitud
+        );
+        let contadorUbicacion = Number(localStorage.getItem("flagDistancia") || 0);
+        contadorUbicacion = distanciaActual > DISTANCIA_MAX ? contadorUbicacion + 1 : contadorUbicacion;
+        const mensaje = contadorUbicacion > 0 ? `Atención: Se ha registrado una distancia fuera del rango permitido (${DISTANCIA_MAX}m) en ${contadorUbicacion} ocasión(es).` : "Registro Correcto";
+
+        // Guardar en Firestore
+        try {
+            console.log(user?.uid);
+            await addDoc(collection(db, "users", user.uid, "jornadas"), {
+                fecha: new Date(inicioTs).toISOString().slice(0,10),
+                inicio: new Date(inicioTs).toLocaleTimeString(),
+                fin: new Date(finTs).toLocaleTimeString(),
+                duracion: formatearTiempo(Math.floor((finTs - inicioTs) / 1000)),
+                mensaje: mensaje
+            });
+            // Resetear estado
+            setInicioTs(null);
+            setTiempo(0);
+            localStorage.removeItem("inicioTs");
+            localStorage.removeItem("flagDistancia");
+        }
+        catch (e) {
+            alert("Error al guardar la jornada: " + e.message);
+        }
+    };
 
     return (
         <div>
             <p>Bienvenido al panel de usuario. Aquí puedes ver y gestionar tu información personal.</p>
-            {/* Agrega más funcionalidades de usuario según sea necesario */}
-            <div
-                
-                style={{
-                    width: 120,
-                    height: 120,
-                    borderRadius: "50%",
-                    background: isRunning ? "#e74c3c" : "#2ecc71",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 40,
-                    cursor: "pointer",
-                    color: "#fff",
-                    userSelect: "none",
-                    margin: "20px auto",
-                }}
-            >
-                {isRunning ? "⏸" : "▶️"}
-            </div>
+            <button onClick={inicioTs? finalizarJornada : iniciarJornada}>
+                {inicioTs ? "Finalizar Jornada" : "Iniciar Jornada"}
+            </button>
+        
+            <p>
+                {inicioTs ? obtenerTiempoActualEnSegundos(inicioTs) : "00:00:00"}
+            </p>
 
-            {/* CONTADOR */}
-            <h2>{formatTime(elapsed)}</h2>
         </div>
+
+        
     );
 }
-
-const STORAGE_KEY = "work_timer";
-
-export const Timer = () => {
-    const [isRunning, setIsRunning] = useState(false);
-    const [startTime, setStartTime] = useState(null);
-    const [elapsed, setElapsed] = useState(0); // ms
-
-    // 🔄 cargar estado si estaba corriendo
-    useEffect(() => {
-        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-        if (saved?.isRunning && saved?.startTime) {
-            setIsRunning(true);
-            setStartTime(saved.startTime);
-            setElapsed(Date.now() - saved.startTime);
-        }
-    }, []);
-
-    // ⏱️ contador visual
-    useEffect(() => {
-        let interval = null;
-
-        if (isRunning) {
-            interval = setInterval(() => {
-                setElapsed(Date.now() - startTime);
-            }, 1000);
-        }
-
-        return () => clearInterval(interval);
-    }, [isRunning, startTime]);
-
-    // ▶️ iniciar
-    const startTimer = () => {
-        const now = Date.now();
-        setIsRunning(true);
-        setStartTime(now);
-        setElapsed(0);
-
-        localStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify({
-                isRunning: true,
-                startTime: now,
-            })
-        );
-    };
-
-    // ⏸ detener
-    const stopTimer = () => {
-        const endTime = Date.now();
-        const duration = endTime - startTime;
-
-        setIsRunning(false);
-        setStartTime(null);
-        setElapsed(0);
-
-        localStorage.removeItem(STORAGE_KEY);
-
-        // 🔥 ACÁ guardás en DB cuando haya internet
-        console.log("Duración real (ms):", duration);
-        console.log("Horas:", duration / 1000 / 60 / 60);
-    };
-
-    const toggleTimer = () => {
-        isRunning ? stopTimer() : startTimer();
-    };
-
-    return (
-        <div style={{ textAlign: "center" }}>
-            {/* CÍRCULO */}
-            <div
-                onClick={toggleTimer}
-                style={{
-                    width: 120,
-                    height: 120,
-                    borderRadius: "50%",
-                    background: isRunning ? "#e74c3c" : "#2ecc71",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 40,
-                    cursor: "pointer",
-                    color: "#fff",
-                    userSelect: "none",
-                }}
-            >
-                {isRunning ? "⏸" : "▶️"}
-            </div>
-
-            {/* CONTADOR */}
-            <h2>{formatTime(elapsed)}</h2>
-        </div>
-    );
-};
-
-
-const formatTime = (ms) => {
-    const totalSeconds = Math.floor(ms / 1000);
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
-
-    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
-        2,
-        "0"
-    )}:${String(seconds).padStart(2, "0")}`;
-};
