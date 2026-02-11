@@ -1,18 +1,20 @@
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { db } from "../../services/firebase";
 import { collection, addDoc } from "firebase/firestore";
-import { distanciaEntreCoordenadas, formatearTiempo, obtenerTiempoActualEnSegundos  }  from "../../helpers/time.helpers";
+import { formatearTiempo, obtenerTiempoActualEnSegundos, contabilizarHoras } from "../../helpers/time.helpers";
+import  useGeoLocation  from "../../hooks/useGeoLocation";
 
 const COORDENADAS_CLUB = {
     latitud: -31.369203,
     longitud: -64.240521
 };
 
-const DISTANCIA_MAX = 300; // en metros
-
 export default function User() {
     const { user } = useAuth();
+    const { flagDistancia, verificarDistancia } = useGeoLocation(COORDENADAS_CLUB);
+    
+    //! Cambiar por objeto en forage
     const [inicioTs, setInicioTs] = useState(
         localStorage.getItem("inicioTs")
             ? Number(localStorage.getItem("inicioTs"))
@@ -20,8 +22,6 @@ export default function User() {
     );
 
     const [tiempo, setTiempo] = useState(0);
-    const [distancia, setDistancia] = useState(null);
-
 
     // Actualizar el tiempo transcurrido cada segundo // Se reinicia al cambiar inicioTs(cambio jornada)
     useEffect(() => {
@@ -34,52 +34,37 @@ export default function User() {
         return () => clearInterval(intervalo);
     }, [inicioTs]);
 
-    // obtener ubicacion y calcular distancia
-    const obtenerUbicacion = () => {
-        return new Promise((resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(resolve, reject, {enableHighAccuracy: true});
-        });
-    };
-
     // Iniciar jornada
     const iniciarJornada = async () => {
         const ts = Date.now();
         setInicioTs(ts);
+        //! Guardar en storage, cambiar por forage
         localStorage.setItem("inicioTs", ts);
-        const pos = await obtenerUbicacion();
-        const distanciaActual = distanciaEntreCoordenadas(
-            pos.coords.latitude,
-            pos.coords.longitude,
-            COORDENADAS_CLUB.latitud,
-            COORDENADAS_CLUB.longitud
-        );
-        
-        const flagDistancia = distanciaActual > DISTANCIA_MAX ? "1" : "0";
-        localStorage.setItem("flagDistancia", flagDistancia);
+
+        // obtener ubicacion y verificar geolocation
+        const flag = await verificarDistancia();
+        //! Guardar en storage, cambiar por forage
+        localStorage.setItem("flagDistancia", flag);
     };
 
     // Finalizar jornada
     const finalizarJornada = async () => {
         const finTs = Date.now();
-        const pos = await obtenerUbicacion();
-        const distanciaActual = distanciaEntreCoordenadas(
-            pos.coords.latitude,
-            pos.coords.longitude,
-            COORDENADAS_CLUB.latitud,
-            COORDENADAS_CLUB.longitud
-        );
-        let contadorUbicacion = Number(localStorage.getItem("flagDistancia") || 0);
-        contadorUbicacion = distanciaActual > DISTANCIA_MAX ? contadorUbicacion + 1 : contadorUbicacion;
-        const mensaje = contadorUbicacion > 0 ? `Atención: Se ha registrado una distancia fuera del rango permitido (${DISTANCIA_MAX}m) en ${contadorUbicacion} ocasión(es).` : "Registro Correcto";
+        // obtener ubicacion y verificar geolocation
+        const flag = await verificarDistancia();
+        // traer contador de ubicacion fuera de rango y sumarle el actual
+        let contadorUbicacion = Number(localStorage.getItem("flagDistancia") || 0) + Number(flag || 0);
+        console.log("contadorUbicacion", contadorUbicacion);
+        console.log("flagDistancia", flag);
+        const mensaje = contadorUbicacion > 2 ? `Ubicacion no permitida` : contadorUbicacion > 0 ? `Distancia fuera de rango (300m) en ${contadorUbicacion} ocasión(es).` : "Ubicacion correcta";
 
         // Guardar en Firestore
         try {
-            console.log(user?.uid);
             await addDoc(collection(db, "users", user.uid, "jornadas"), {
-                fecha: new Date(inicioTs).toISOString().slice(0,10),
+                fecha: new Date(inicioTs).toISOString().slice(0, 10),
                 inicio: new Date(inicioTs).toLocaleTimeString(),
                 fin: new Date(finTs).toLocaleTimeString(),
-                duracion: formatearTiempo(Math.floor((finTs - inicioTs) / 1000)),
+                duracion: contabilizarHoras((finTs - inicioTs) / 1000),
                 mensaje: mensaje
             });
             // Resetear estado
@@ -96,16 +81,16 @@ export default function User() {
     return (
         <div>
             <p>Bienvenido al panel de usuario. Aquí puedes ver y gestionar tu información personal.</p>
-            <button onClick={inicioTs? finalizarJornada : iniciarJornada}>
+            <button onClick={inicioTs ? finalizarJornada : iniciarJornada}>
                 {inicioTs ? "Finalizar Jornada" : "Iniciar Jornada"}
             </button>
-        
+
             <p>
                 {inicioTs ? obtenerTiempoActualEnSegundos(inicioTs) : "00:00:00"}
             </p>
 
         </div>
 
-        
+
     );
 }

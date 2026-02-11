@@ -1,20 +1,4 @@
-// DISTANCIA A PUNTO DE REFERENCIA
-const toRad = (v) => (v * Math.PI) / 180;
-
-export const distanciaEntreCoordenadas = (lat1, lon1, lat2, lon2) => {
-    const R = 6371000; //METROS
-    const dLat = toRad(lat2 - lat1);
-    const dLon = toRad(lon2 - lon1);
-    const a =
-        Math.sin(dLat / 2) ** 2 +
-        Math.cos(toRad(lat1)) *
-            Math.cos(toRad(lat2)) *
-            Math.sin(dLon / 2) ** 2;
-
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-};
-
-// FORMATEAR TIEMPO Y REDONDEAR 15 MINUTOS ARRIBA
+// FORMATEAR TIEMPO EN HH:MM
 export const formatearTiempo = (segundos) => {
     let hrs = Math.floor(segundos / 3600);
     let mins = Math.floor((segundos % 3600) / 60);
@@ -28,6 +12,16 @@ export const formatearTiempo = (segundos) => {
     }
     // retornar en formato HH:MM
     return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+};
+
+//Contabilizar horas / redondeado a horas
+export const contabilizarHoras = (segundos) => {
+    let hrs = Math.floor(segundos / 3600);
+    let mins = Math.floor((segundos % 3600) / 60);
+    
+    hrs += mins > 45 ? 1 : mins > 30 ? 0.75 : mins > 15 ? 0.5 : mins >= 0 ? 0.25 : 0;
+
+    return hrs < 2.5 ? 2.5 : hrs;
 };
 
 // OBTENER TIEMPO ACTUAL EN SEGUNDOS Respecto al inicio
