@@ -4,6 +4,9 @@ import { Admin } from "../components/admin/Admin";
 import  User  from "../components/user/User";
 import { Footer } from "../components/layout/Footer";
 import { useAuth } from '../context/AuthContext';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import MisHoras from '../components/user/MisHoras';
+import VerHoras from '../components/admin/VerHoras';
 
 function App() {
 
@@ -13,14 +16,19 @@ function App() {
   if (!user) return <LoginPopUp />;
 
   return (
-    <>
-      <Navbar user={datos} onlogout={logout} />
+    <BrowserRouter>
+      <Navbar user={{...datos, uid: user.uid}} onlogout={logout} />
+      
+      <Routes>
 
-      {datos?.rol === "admin" && <Admin />}
-      {datos?.rol === "usuario" && <User />}
+        <Route path='/' element= {datos?.rol === "admin"? <Admin/> : <User/> } />
+        <Route path='/admin' element= {<VerHoras/>} />
+        <Route path='/user/:id' element= {<MisHoras/>} />
+        
+      </Routes>
 
       <Footer/>
-    </>
+    </BrowserRouter>
   );
 }
 
