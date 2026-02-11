@@ -3,7 +3,7 @@ import { useAuth } from "../../context/AuthContext";
 import { db } from "../../services/firebase";
 import { collection, addDoc } from "firebase/firestore";
 import { formatearTiempo, obtenerTiempoActualEnSegundos, contabilizarHoras } from "../../helpers/time.helpers";
-import  useGeoLocation  from "../../hooks/useGeoLocation";
+import useGeoLocation from "../../hooks/useGeoLocation";
 
 const COORDENADAS_CLUB = {
     latitud: -31.369203,
@@ -13,7 +13,7 @@ const COORDENADAS_CLUB = {
 export default function User() {
     const { user } = useAuth();
     const { flagDistancia, verificarDistancia } = useGeoLocation(COORDENADAS_CLUB);
-    
+
     //! Cambiar por objeto en forage
     const [inicioTs, setInicioTs] = useState(
         localStorage.getItem("inicioTs")
@@ -54,8 +54,6 @@ export default function User() {
         const flag = await verificarDistancia();
         // traer contador de ubicacion fuera de rango y sumarle el actual
         let contadorUbicacion = Number(localStorage.getItem("flagDistancia") || 0) + Number(flag || 0);
-        console.log("contadorUbicacion", contadorUbicacion);
-        console.log("flagDistancia", flag);
         const mensaje = contadorUbicacion > 2 ? `Ubicacion no permitida` : contadorUbicacion > 0 ? `Distancia fuera de rango (300m) en ${contadorUbicacion} ocasión(es).` : "Ubicacion correcta";
 
         // Guardar en Firestore
@@ -84,7 +82,6 @@ export default function User() {
             <button onClick={inicioTs ? finalizarJornada : iniciarJornada}>
                 {inicioTs ? "Finalizar Jornada" : "Iniciar Jornada"}
             </button>
-
             <p>
                 {inicioTs ? obtenerTiempoActualEnSegundos(inicioTs) : "00:00:00"}
             </p>
