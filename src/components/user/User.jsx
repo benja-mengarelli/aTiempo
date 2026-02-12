@@ -77,10 +77,10 @@ export default function User() {
     };
 
     return (
-        <div>
-            <p>Bienvenido al panel de usuario. Aquí puedes ver y gestionar tu información personal.</p>
+        <div className="circulo-jornada">
+            <h2>{inicioTs ? "Jornada corriendo" : "Iniciar jornada"}</h2>
             <button onClick={inicioTs ? finalizarJornada : iniciarJornada}>
-                {inicioTs ? "Finalizar Jornada" : "Iniciar Jornada"}
+                {inicioTs ? "Finalizar ⏸️" : "Iniciar ▶️"}
             </button>
             <p>
                 {inicioTs ? obtenerTiempoActualEnSegundos(inicioTs) : "00:00:00"}

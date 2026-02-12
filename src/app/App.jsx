@@ -21,8 +21,8 @@ function App() {
       
       <Routes>
 
-        <Route path='/' element= {datos?.rol === "admin"? <Admin/> : <User/> } />
-        <Route path='/admin' element= {<VerHoras/>} />
+        <Route path='/' element= {datos?.rol === "admin"? <Admin datos= {{...datos}}/>  : <User/> } />
+        <Route path='/admin/:id' element= {<VerHoras />} />
         <Route path='/user/:id' element= {<MisHoras/>} />
         
       </Routes>
