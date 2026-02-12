@@ -123,7 +123,7 @@ export default function HoursViewer({ userId, initialMonth, initialView }) {
     }
 
     return (
-                <div className="mis-horas">
+        <div className="mis-horas">
             {/* Filtros */}
             <div className="filtros">
                 <div className="visualizacion-fechas">
