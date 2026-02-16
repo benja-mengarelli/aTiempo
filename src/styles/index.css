@@ -1,3 +1,24 @@
+/* Theme Toggle Button Styles */
+.navbar button[aria-label="Cambiar tema"] {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    background: var(--bg-card);
+    color: var(--texto);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    transition: background 0.2s, color 0.2s, border 0.2s;
+    margin-left: 8px;
+}
+.navbar button[aria-label="Cambiar tema"]:hover {
+    background: var(--row-hover);
+    color: var(--primario);
+    border-color: var(--primario);
+}
 /*! APP CSS */
 * {
     margin: 0;
@@ -5,15 +26,67 @@
     box-sizing: border-box;
 }
 
+:root {
+    /*! Colores light y dark  */
+    --bg: #f3f4f6;
+    --bg-card: #ffffff;
+    --primario: #2563EB;
+    --secundario: #10B981;
+    --texto: #0F172A;
+    --border: #e5e7eb;
+    --row-hover: #e0e7ff;
+
+    /*! Fondo glass  */
+    --glass-bg: rgba(255, 255, 255, 0.25);
+    --glass-bg-hover: rgba(255, 255, 255, 0.35);
+    --glass-border: rgba(255, 255, 255, 0.3);
+    --glass-blur: 10px;
+    --glass-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.dark-mode {
+    --bg: #0f172a;
+    --bg-card: #020617;
+    --primario: #60A5FA;
+    --secundario: #34D399;
+    --texto: #E5E7EB;
+    --border: #1e293b;
+    --row-hover: #1e3a8a;
+
+    --glass-bg: rgba(255, 255, 255, 0.08);
+    --glass-bg-hover: rgba(255, 255, 255, 0.14);
+    --glass-border: rgba(255, 255, 255, 0.15);
+    --glass-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.caja-navbar {
+    position: sticky;
+    top: 10px;
+    display: flex;
+    z-index: 1000;
+    justify-content: center;
+    pointer-events: none;
+}
+
 .navbar {
-    width: 100%;
-    color: white;
-    background-color: #222121;
-    padding: 10px;
+    pointer-events: auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 10px 16px;
+    gap: 40px;
+    max-width: min(960px, 92vw);
+    width: fit-content;
+
+    color: var(--texto);
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    --webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: 40px;
 }
+
 .navbar img {
     width: 50px;
     height: 50px;
@@ -23,11 +96,11 @@
 
 body {
     font-family: Arial, sans-serif;
-    background-color: #b4a8a8a5;
+    background-color: var(--primario);
 }
 
 button {
-    background-color: #444343;
+    background-color: var(--tester-color-third);
     align-items: center;
     color: white;
     border: none;
@@ -136,7 +209,7 @@ input {
     gap: 10px;
 }
 
-.mis-horas .filtros .visualizacion-fechas button{
+.mis-horas .filtros .visualizacion-fechas button {
     margin-right: 5px;
     padding: 8px 12px;
     border: none;
@@ -173,11 +246,12 @@ input {
     background-color: #f0f0f0;
 }
 
-.registro-por-mes th{
+.registro-por-mes th {
     background-color: grey;
 }
 
-.registro-por-mes th, .registro-por-mes td {
+.registro-por-mes th,
+.registro-por-mes td {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
@@ -189,7 +263,7 @@ input {
     gap: 20px;
 }
 
-.registro-por-quincena-contenedor > div {
+.registro-por-quincena-contenedor>div {
     flex: 1;
     border: 1px solid #ddd;
     padding: 15px;
