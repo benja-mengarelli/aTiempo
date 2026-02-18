@@ -48,7 +48,7 @@ export function Admin({ datos }) {
 
     return (
         
-        <div className="lista-usuarios">
+        <div className="lista-usuarios" style={{display:"flex", justifyContent: "space-around", alignContent: "center"}}>
             {usuarios
             .filter(u => u.rol === "usuario")
             .filter(u => u.activo !== false)
@@ -62,6 +62,27 @@ export function Admin({ datos }) {
 
                 </div>
             ))}
+            <div className="usuario-card">
+                <div className="usuario-item">
+                    <img src="/img/usuario2.png" alt="" style= {{width:"100px", height:"100px", borderRadius: "25%"}}/>
+                </div>
+                <h3>usuario2</h3>
+                <button className="eliminar-usuario">⛔</button>
+            </div>
+            <div className="usuario-card">
+                <div className="usuario-item">
+                    <img src="/img/usuario3.png" alt="" style= {{width:"100px", height:"100px", borderRadius: "25%"}}/>
+                </div>
+                <h3>usuario3</h3>
+                <button className="eliminar-usuario">⛔</button>
+            </div>
+            <div className="usuario-card">
+                <div className="usuario-item">
+                    <img src="/img/usuario4.png" alt="" style= {{width:"100px", height:"100px", borderRadius: "25%"}}/>
+                </div>
+                <h3>usuario4</h3>
+                <button className="eliminar-usuario">⛔</button>
+            </div>
             
         </div>
     );

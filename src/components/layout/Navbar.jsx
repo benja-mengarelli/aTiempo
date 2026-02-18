@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 
 export function Navbar({ user, onlogout }) {
     const [darkMode, setDarkMode] = useState(() => {
-        // Check localStorage or default to false
+        //! Verificar local storage
         return localStorage.getItem("theme") === "dark";
     });
 
@@ -26,17 +26,13 @@ export function Navbar({ user, onlogout }) {
         <div className="caja-navbar">
             <nav className="navbar">
                 <Link to="/"><img src={user?.imagen} alt={user?.nombre} /></Link>
-                {/* {user?.rol === "admin" && (
-                    <button>
-                        <Link to={`/admin/${user.uid}`}>Panel Admin</Link>
-                    </button>
-                )} */}
+
                 {user?.rol === "usuario" && (
                     <button>
                         <Link to={`/user/${user.uid}`}>Mis Horas</Link>
                     </button>
                 )}
-                <button onClick={handleThemeToggle} aria-label="Cambiar tema" style={{ fontSize: 22, padding: "0 12px", borderRadius: 20, border: "none", background: "none", cursor: "pointer" }}>
+                <button onClick={handleThemeToggle} aria-label="Cambiar tema">
                     {darkMode ? "🌙" : "☀️"}
                 </button>
                 <button onClick={() => { onlogout(); }}>✖️Salir</button>
