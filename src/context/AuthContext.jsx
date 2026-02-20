@@ -12,22 +12,30 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const unsub = onAuthStateChanged(auth, async (user) => {
-            setUser(user);
             try {
-                const docRef = doc(db, "users", user.uid);
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    setDatos(docSnap.data());
+                if (user) {
+
+                    setUser(user);
+
+                    const docRef = doc(db, "users", user.uid);
+                    const docSnap = await getDoc(docRef);
+
+                    if (docSnap.exists()) {
+                        setDatos(docSnap.data());
+                    } else {
+                        setDatos(null);
+                    }
                 } else {
-                    console.log("No such document!");
+                    setUser(null);
                     setDatos(null);
                 }
             } catch (e) {
                 console.error("Error al cargar usuario:", e);
+                setUser(null);
                 setDatos(null);
+            } finally {
+                setCargando(false);
             }
-
-            setCargando(false);
         });
 
         return () => unsub();

@@ -4,6 +4,7 @@ import { db } from "../../services/firebase";
 import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import PantallaCarga from "../layout/PantallaCarga";
 
 
 export function Admin({ datos }) {
@@ -33,7 +34,7 @@ export function Admin({ datos }) {
             .finally(() => setCargando(false));
     }, []);
 
-    if (cargando) return <div>Cargando...</div>;
+    if (cargando) return <PantallaCarga />;
 
     const eliminarUsuario = async (id) => {
         if (!window.confirm("¿Estás seguro de que quieres eliminar este usuario?")) return;

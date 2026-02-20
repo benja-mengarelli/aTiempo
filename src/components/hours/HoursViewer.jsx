@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import useJornadas from '../../hooks/useJornadas';
+import PantallaCarga from '../layout/PantallaCarga';
 import { horasFiltradas, agruparPor15Dias, agruparPorSemana, getMesesDisponibles } from '../../helpers/jornada.helpers';
 import { useAuth } from '../../context/AuthContext';
 import { addDoc, deleteDoc, doc, collection } from 'firebase/firestore';
@@ -19,7 +20,7 @@ export default function HoursViewer({ userId, initialMonth, initialView }) {
     const abrirForm = () => setMostrarForm(true);
     const cerrarForm = () => setMostrarForm(false);
 
-    if (loading) return <div>Cargando jornadas...</div>;
+    if (loading) return <PantallaCarga />;
 
     const guardarJornada = async (jornada) => {
         if (datos.rol !== "admin" || !datos) {
@@ -101,7 +102,7 @@ export default function HoursViewer({ userId, initialMonth, initialView }) {
         const filtradas = horasFiltradas(jornadas, mes);
         const agrupadas = agruparPor15Dias(filtradas);
         return (
-            <div className='registro-15-dias'>
+            <div className={datos?.rol === "admin"? "registro-15-dias admin" : "registro-15-dias usuario"}>
 
                 <div className='header-registro'>
                     <h3>Registros por 15 días</h3>
@@ -166,7 +167,7 @@ export default function HoursViewer({ userId, initialMonth, initialView }) {
         const filtradas = horasFiltradas(jornadas, mes);
         const semanas = agruparPorSemana(filtradas);
         return (
-            <div className='registro-por-semana'>
+            <div className={datos?.rol === "admin"? "registro-por-semana admin" : "registro-por-semana usuario"}>
                 <div className='header-registro'>
                     <h3>Registros por semana</h3>
 

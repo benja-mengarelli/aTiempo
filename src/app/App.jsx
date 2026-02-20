@@ -2,17 +2,17 @@ import LoginPopUp from '../components/auth/Login';
 import { Navbar } from '../components/layout/Navbar';
 import { Admin } from "../components/admin/Admin";
 import  User  from "../components/user/User";
-import { Footer } from "../components/layout/Footer";
 import { useAuth } from '../context/AuthContext';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import MisHoras from '../components/user/MisHoras';
 import VerHoras from '../components/admin/VerHoras';
+import PantallaCarga from '../components/layout/PantallaCarga';
 
 function App() {
 
   const {user, datos, cargando, logout} = useAuth();
 
-  if (cargando) return <div>Cargando...</div>;
+  if (cargando) return <PantallaCarga />;
   if (!user) return <LoginPopUp />;
 
   return (
@@ -26,8 +26,6 @@ function App() {
         <Route path='/user/:id' element= {<MisHoras/>} />
         
       </Routes>
-
-      {/* <Footer/> */}
     </BrowserRouter>
   );
 }
