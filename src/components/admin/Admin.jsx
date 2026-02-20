@@ -48,42 +48,23 @@ export function Admin({ datos }) {
 
     return (
         
-        <div className="lista-usuarios" style={{display:"flex", justifyContent: "space-around", alignContent: "center"}}>
+        <div className="lista-usuarios">
             {usuarios
             .filter(u => u.rol === "usuario")
             .filter(u => u.activo !== false)
             .map((u) => (
                 <div key={u.id} className="usuario-card">
-                    <Link to={`/admin/${u.id}`} className="usuario-item" >
-                        <img src={u.imagen} alt="usuario" style= {{width:"100px", height:"100px"}} />
-                    </Link>
-                    <h3>{u.nombre}</h3>
-                    <button className="eliminar-usuario" onClick={() => eliminarUsuario(u.id) }>⛔</button>
 
+                    <Link to={`/admin/${u.id}`} className="usuario-item" >
+                        <img src={u.imagen} alt={u.nombre}/>
+                    </Link>
+
+                    <h3>{u.nombre}</h3>
+
+                    <button className="eliminar-usuario" onClick={() => eliminarUsuario(u.id) }>⛔</button>
+                    
                 </div>
             ))}
-            <div className="usuario-card">
-                <div className="usuario-item">
-                    <img src="/img/usuario2.png" alt="" style= {{width:"100px", height:"100px", borderRadius: "25%"}}/>
-                </div>
-                <h3>usuario2</h3>
-                <button className="eliminar-usuario">⛔</button>
-            </div>
-            <div className="usuario-card">
-                <div className="usuario-item">
-                    <img src="/img/usuario3.png" alt="" style= {{width:"100px", height:"100px", borderRadius: "25%"}}/>
-                </div>
-                <h3>usuario3</h3>
-                <button className="eliminar-usuario">⛔</button>
-            </div>
-            <div className="usuario-card">
-                <div className="usuario-item">
-                    <img src="/img/usuario4.png" alt="" style= {{width:"100px", height:"100px", borderRadius: "25%"}}/>
-                </div>
-                <h3>usuario4</h3>
-                <button className="eliminar-usuario">⛔</button>
-            </div>
-            
         </div>
     );
 }

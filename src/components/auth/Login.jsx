@@ -1,12 +1,23 @@
 import { useState } from "react";
 import { login, register } from "../../services/auth.service";
 
+
+
 export default function LoginPopUp() {
     const [modoRegistro, setModoRegistro] = useState(false);
     const [nombre, setNombre] = useState("");
     const [email, setEmail] = useState("");
     const [pass, setPass] = useState("");
     const [error, setError] = useState(null);
+    const [imagen, setImagen] = useState("/img/usuario.png")
+
+    const options = [
+    { id: "b", src: "/img/usuario.png", label: "Opción B" },
+    { id: "a", src: "/img/adm-v2.png", label: "Opción A" },
+    { id: "c", src: "/img/usuario2.png", label: "Opción C" },
+    { id: "d", src: "/img/usuario3.png", label: "Opción D" },
+    { id: "e", src: "/img/usuario4.png", label: "Opción E" }
+];
 
     const hacerLogin = async () => {
         try {
@@ -19,7 +30,7 @@ export default function LoginPopUp() {
 
     const hacerRegistro = async () => {
         try {
-            await register(nombre, email, pass);
+            await register(nombre, email, pass, imagen);
         } catch (e) {
             setError(e.message);
             alert("Error al registrar usuario: " + e.message);
@@ -62,6 +73,21 @@ export default function LoginPopUp() {
                         onChange={(e) => setPass(e.target.value)}
                         required minLength={6} maxLength={12}
                     />
+                    {modoRegistro && (
+                        <div className="imagen-login">
+                        {options.map((opt) => (
+                            <button
+                                key={opt.id}
+                                type="button"
+                                className={imagen === opt.src ? "seleccionada" : "none"}
+                                onClick={() => setImagen(opt.src)}
+                            >
+                                <img src={opt.src} alt={opt.label} style={{width: "50px", height: "50px"}} />
+                            </button>
+                        ))}
+                    </div>
+                    )}
+                    
 
                     {error && <p className="error">{error}</p>}
 

@@ -60,7 +60,7 @@ export default function HoursViewer({ userId, initialMonth, initialView }) {
                 <div className='header-registro'>
                     <h3>Registros del mes (total: {total})</h3>
 
-                    {datos?.rol === "admin" && <button onClick={abrirForm} className='btn-agregar-jornada'>Agregar jornada </button>}
+                    {datos?.rol === "admin" && <button onClick={abrirForm} className='btn-agregar-jornada'><strong>Agregar jornada</strong> </button>}
                 </div>
                 {filtradas.length === 0 ? (
                     <p>No hay registros para este mes.</p>
@@ -69,23 +69,21 @@ export default function HoursViewer({ userId, initialMonth, initialView }) {
                         <thead>
                             <tr>
                                 <th >Fecha</th>
-                                <th >Inicio</th>
-                                <th >Fin</th>
+                                <th >Inicio - Fin</th>
                                 <th >Duración</th>
                                 <th >Mensaje</th>
-                                {datos?.rol === "admin" && <th>Borrar</th>}
+                                {datos?.rol === "admin" && <th>🗑️</th>}
                             </tr>
                         </thead>
                         <tbody>
                             {filtradas.map((h) => (
-                                <tr key={h.id} style={{ backgroundColor: h.mensaje == "ubicacion correcta" ? "var(--secundario)" : h.mensaje == "jornada agregada" ? "var(--medio)" : "var(--incorrecto)" }}>
+                                <tr key={h.id} style={{ backgroundColor: "var(--bg-card)" }} >
                                     <td >{h.fecha}</td>
-                                    <td >{h.inicio}</td>
-                                    <td >{h.fin}</td>
+                                    <td >{h.inicio} - {h.fin}</td>
                                     <td >{h.duracion}</td>
-                                    <td >{h.mensaje}</td>
-                                    {datos?.rol === "admin" &&
+                                    <td style={{ backgroundColor: h.mensaje == "ubicacion correcta" ? "var(--secundario)" : h.mensaje == "jornada agregada" ? "var(--medio)" : "var(--incorrecto)" }}>{h.mensaje}</td>
 
+                                    {datos?.rol === "admin" &&
                                         <button onClick={() => eliminarJornada(h.id)}>
                                             ⛔
                                         </button>
@@ -176,17 +174,20 @@ export default function HoursViewer({ userId, initialMonth, initialView }) {
                 </div>
                 <div className='grid-semanal'>
                     {[semanas.semana1, semanas.semana2, semanas.semana3, semanas.semana4].map((semana, idx) => (
-                        <div key={idx}>
+                        <div key={idx} className='contenedor-grid-semanal'>
                             <h4>Semana {idx + 1} (Días {semana.dias}) - Total: {semana.total}</h4>
                             {semana.horas.length === 0 ? (
                                 <p>No hay registros.</p>
                             ) : (
                                 <ul>
                                     {semana.horas.map((h) => (
-                                        <li key={h.id} style={{ backgroundColor: h.mensaje == "ubicacion correcta" ? "var(--secundario)" : h.mensaje == "jornada agregada" ? "var(--medio)" : "var(--incorrecto)" }}>
-                                            <strong>{h.fecha}</strong> - {h.inicio} a {h.fin} ({h.duracion})
-                                            <br />
-                                            <small>{h.mensaje}</small>
+                                        <li key={h.id}>
+                                            <div style={{ backgroundColor: h.mensaje == "ubicacion correcta" ? "var(--secundario)" : h.mensaje == "jornada agregada" ? "var(--medio)" : "var(--incorrecto)" }}>
+                                                <strong>{h.fecha}</strong> - {h.inicio} a {h.fin} ({h.duracion})
+                                                <br />
+                                                <small>{h.mensaje}</small>
+                                            </div>
+
                                             {datos?.rol === "admin" &&
                                                 <button onClick={() => eliminarJornada(h.id)}>
                                                     ⛔

@@ -25,6 +25,7 @@
     --glass-blur: 10px;
     --glass-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
+
 .dark-mode {
     --bg: #000000;
     --bg-card: #020617;
@@ -85,10 +86,10 @@ body {
     margin-right: 10px;
 }
 
-.navbar button{
+.navbar button {
     font-size: 1.1rem;
     background: none;
-    
+
     border: none;
     color: var(--texto);
     cursor: pointer;
@@ -103,9 +104,10 @@ body {
     align-items: center;
     justify-content: center;
     font-size: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     transition: background 0.2s, color 0.2s, border 0.2s;
 }
+
 .navbar button:hover {
     color: var(--primario);
     border-color: var(--primario);
@@ -144,6 +146,44 @@ body {
     margin-top: 10px;
 }
 
+.modal-caja .imagen-login {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    margin-top: 5px;
+    width: 100%;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.modal-caja .imagen-login button {
+    border: none;
+    cursor: pointer;
+}
+
+.modal-caja .imagen-login .seleccionada {
+    box-shadow: 0 0 2px 2px rgba(96, 165, 250, 0.951);
+    animation: pop 0.4s ease;
+}
+
+@keyframes pop {
+    0% {
+        transform: scale(0.80);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+
+.modal-caja .imagen-login img {
+    width: 45px;
+    height: 45px;
+    border-radius: 8px;
+
+}
+
 .modal-caja .btn-login {
     width: 100%;
     margin-top: 15px;
@@ -152,6 +192,7 @@ body {
     color: var(--texto);
     border: none;
     border-radius: 6px;
+    cursor: pointer;
 }
 
 .error {
@@ -176,7 +217,7 @@ body {
     width: 100%;
 }
 
-.circulo-jornada h2{
+.circulo-jornada h2 {
     margin-bottom: 20px;
     color: var(--texto);
     padding: 10px 20px;
@@ -204,6 +245,44 @@ body {
     background-color: var(--bg-card);
     padding: 10px 20px;
     border-radius: 20px;
+}
+
+
+/*! Pantalla admin Usuarios  */
+.lista-usuarios {
+    height: 90vh;
+    width: 100vw;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 30px;
+}
+
+.lista-usuarios .usuario-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 150px;
+    height: 150px;
+    margin: 15px;
+}
+
+.lista-usuarios .usuario-card img {
+    width: 100px;
+    height: 100px;
+    border-radius: 25%;
+}
+
+.lista-usuarios .usuario-card h3 {
+    margin-bottom: 5px;
+}
+
+.lista-usuarios .usuario-card button {
+    width: 100px;
+    background: var(--incorrecto);
+    cursor: pointer;
+    border-radius: 10px 10px 20px 20px;
 }
 
 
@@ -261,10 +340,10 @@ body {
 }
 
 /*! Tabla registro mensual  */
-.registro-por-mes{
+.registro-por-mes {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
     width: 95vw;
 }
@@ -273,21 +352,26 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     gap: 5px;
 }
 
+.header-registro h3,
+.btn-agregar-jornada {
+    padding: 8px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
 .header-registro h3 {
-    padding: 5px;
-    margin: 0 0 5px 30px;
     background-color: var(--bg-card);
     border-radius: 8px 0 0 8px;
 }
 
 .header-registro .btn-agregar-jornada {
-    width: 120px;
-    height: 33px;
-    margin-bottom: 5px;
     background: var(--secundario);
     color: var(--texto);
     border-radius: 0 5px 5px 0;
@@ -296,7 +380,6 @@ body {
 }
 
 .registro-por-mes table {
-    width: 100%;
     border-collapse: collapse;
 }
 
@@ -305,33 +388,30 @@ body {
     border: 1px solid var(--border);
     padding: 5px;
     text-align: left;
+    border-radius: 10px 10px 0 0;
 }
 
 .registro-por-mes tbody tr {
     text-align: left;
+
 }
 
 .registro-por-mes tbody tr td {
     border: 2px solid var(--border);
     padding: 8px;
+    border-radius: 10px 0 0 10px;
 }
 
-.registro-por-mes .btn-eliminar{
-    /* all: unset; */
-}
-
-.registro-por-mes tbody tr button{
+.registro-por-mes tbody tr button {
     all: unset;
+    padding: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.3rem;
-    background: var(--glass-bg);
-    backdrop-filter: blur(var(--glass-blur));
-    --webkit-backdrop-filter: blur(var(--glass-blur));
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
-    border-radius: 5px;
+    font-size: 1rem;
+    background: var(--bg-card);
+    border-radius: 0 10px 10px 0;
+    cursor: pointer;
 }
 
 
@@ -351,7 +431,8 @@ body {
     border-radius: 28px;
 }
 
-.registro-15-dias-contenedor .quincenas h4 {
+.registro-15-dias-contenedor .quincenas h4,
+.grid-semanal div h4 {
     padding: 8px;
     margin-bottom: 10px;
     color: var(--texto);
@@ -363,25 +444,31 @@ body {
     border-radius: 20px 20px 0 0;
 }
 
-.registro-15-dias-contenedor .quincenas ul {
+.registro-15-dias-contenedor .quincenas ul,
+.grid-semanal div ul {
     list-style: none;
     padding: 0;
+
 }
 
-.registro-15-dias-contenedor .quincenas ul li {
+.registro-15-dias-contenedor .quincenas ul li,
+.grid-semanal ul li {
     margin-bottom: 10px;
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    height: 100%;
+    /* height: 100%; */
 }
 
-.registro-15-dias-contenedor .quincenas ul li div {
+.registro-15-dias-contenedor .quincenas ul li div,
+.grid-semanal ul li div {
     width: 85%;
     padding: 8px;
     border-radius: 10px 0 0 10px;
 }
-.registro-15-dias-contenedor .quincenas ul li button {
+
+.registro-15-dias-contenedor .quincenas ul li button,
+.grid-semanal ul li button {
     width: 15%;
     cursor: pointer;
     height: 70px;
@@ -403,11 +490,11 @@ body {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 15px;  
-    width: 100%;  
+    gap: 15px;
+    width: 100%;
 }
 
-.grid-semanal div {
+.grid-semanal .contenedor-grid-semanal {
     border: 1px solid var(--border);
     padding: 15px;
     border-radius: 10px;
@@ -415,33 +502,74 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 300px;;
+    width: 300px;
+    ;
     max-height: 90vh;
     overflow-y: scroll;
 }
 
-.grid-semanal div h4 {
-    padding: 8px;
-    margin-bottom: 10px;
-    color: var(--texto);
+
+/*! Form agregar Jornada  */
+.modal-jornada {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    z-index: 999;
+
     background: var(--glass-bg);
     backdrop-filter: blur(var(--glass-blur));
     --webkit-backdrop-filter: blur(var(--glass-blur));
     border: 1px solid var(--glass-border);
     box-shadow: var(--glass-shadow);
-    border-radius: 20px 20px 0 0;
+
 }
 
-.grid-semanal div ul {
-    list-style: none;
-    padding: 0;
-}
-
-.grid-semanal div ul li {
-    margin-bottom: 8px;
-    padding: 6px;
+.modal-jornada form {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.214);
     border-radius: 20px;
+    border: 4px solid var(--border);
+
+    height: 300px;
+    width: 300px;
 }
+
+.modal-jornada h3 {
+    margin-top: 25px;
+}
+
+.modal-jornada-labels {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.modal-jornada-labels input {
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+.modal-jornada-buttons button {
+    margin-bottom: 25px;
+    padding: 3px 5px;
+    cursor: pointer;
+}
+
+.modal-jornada-buttons button:nth-child(1) {
+    background: var(--primario);
+    margin-right: 20px;
+}
+
+.modal-jornada-buttons button:nth-child(2) {
+    background: var(--incorrecto);
+}
+
+
+
 
 
 
