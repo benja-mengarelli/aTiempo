@@ -16,11 +16,21 @@ export const formatearTiempo = (segundos) => {
 
 //Contabilizar horas / redondeado a horas
 export const contabilizarHoras = (segundos) => {
+    // Always work with positive seconds
+    segundos = Math.abs(segundos);
     let hrs = Math.floor(segundos / 3600);
     let mins = Math.floor((segundos % 3600) / 60);
-    
-    hrs += mins > 45 ? 1 : mins > 30 ? 0.75 : mins > 15 ? 0.5 : mins >= 0 ? 0.25 : 0;
-
+    // Redondeo por cuartos de hora
+    if (mins > 45) {
+        hrs += 1;
+        mins = 0;
+    } else if (mins > 30) {
+        hrs += 0.75;
+    } else if (mins > 15) {
+        hrs += 0.5;
+    } else if (mins > 0) {
+        hrs += 0.25;
+    }
     return hrs < 2.5 ? 2.5 : hrs;
 };
 

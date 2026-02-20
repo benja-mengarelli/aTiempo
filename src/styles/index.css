@@ -86,14 +86,15 @@ body {
     margin-right: 10px;
 }
 
-.navbar button {
+.navbar button, .btn-mis-horas {
     font-size: 1.1rem;
     background: none;
-
+    text-decoration: none;
     border: none;
     color: var(--texto);
     cursor: pointer;
 }
+
 
 .navbar button[aria-label="Cambiar tema"] {
     padding: 0 12px;
@@ -112,6 +113,77 @@ body {
     color: var(--primario);
     border-color: var(--primario);
 }
+
+/*! Pantalla carga  */
+.overlay-carga {
+    position: fixed;
+    inset: 0;
+    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    pointer-events: all;
+}
+.animacion-carga {
+    position: relative;
+    width: 120px;
+    height: 120px;
+}
+.cuadrado {
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: var(--texto);
+    background: var(--bg);
+    backdrop-filter: blur(6px);
+    animation: pulsoRotacion 1.6s ease-in-out infinite;
+}
+
+.cuadrado-b {
+    transform: rotate(-45deg);
+    animation-delay: 0.8s;
+}
+
+.cuadrado span {
+    transform: rotate(-45deg);
+    font-size: 14px;
+    opacity: 0.85;
+    animation: pulsoTexto 1.6s ease-in-out infinite;
+}
+
+@keyframes pulsoRotacion {
+    0% {
+        transform: scale(0.9) rotate(0deg);
+        opacity: 0.6;
+    }
+    50% {
+        transform: scale(1.05) rotate(180deg);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0.9) rotate(360deg);
+        opacity: 0.6;
+    }
+}
+
+@keyframes pulsoTexto {
+    0%, 100% {
+        transform: rotate(-45deg) scale(0.9);
+        opacity: 0.6;
+    }
+    50% {
+        transform: rotate(-45deg) scale(1.05);
+        opacity: 1;
+    }
+}
+
 
 
 /*! LOGIN CSS  */
@@ -138,6 +210,7 @@ body {
     border: 1px solid var(--glass-border);
     box-shadow: var(--glass-shadow);
     border-radius: 40px;
+    font-size: 16px;
 }
 
 .modal-caja input {
@@ -176,12 +249,10 @@ body {
     }
 }
 
-
 .modal-caja .imagen-login img {
     width: 45px;
     height: 45px;
     border-radius: 8px;
-
 }
 
 .modal-caja .btn-login {
@@ -457,18 +528,24 @@ body {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    /* height: 100%; */
 }
 
-.registro-15-dias-contenedor .quincenas ul li div,
-.grid-semanal ul li div {
+.registro-15-dias.admin .registro-15-dias-contenedor .quincenas ul li div,
+.registro-por-semana.admin .grid-semanal ul li div {
     width: 85%;
     padding: 8px;
     border-radius: 10px 0 0 10px;
 }
 
-.registro-15-dias-contenedor .quincenas ul li button,
-.grid-semanal ul li button {
+.registro-15-dias.usuario .registro-15-dias-contenedor .quincenas ul li div,
+.registro-por-semana.usuario .grid-semanal ul li div{
+    width: 100%;
+    padding: 8px;
+    border-radius: 10px;
+}
+
+.registro-15-dias.admin .registro-15-dias-contenedor .quincenas ul li button,
+.registro-por-semana.admin .grid-semanal ul li button {
     width: 15%;
     cursor: pointer;
     height: 70px;
@@ -503,7 +580,6 @@ body {
     flex-direction: column;
     align-items: center;
     width: 300px;
-    ;
     max-height: 90vh;
     overflow-y: scroll;
 }

@@ -1,31 +1,37 @@
 import { useState } from "react"
 import { contabilizarHoras } from "../../helpers/time.helpers";
+import PantallaCarga from "../layout/PantallaCarga";
 
 const FormAgregarJornada = ({ cerrar, guardar }) => {
     const [fecha, setFecha] = useState("");
     const [inicio, setInicio] = useState("");
     const [fin, setFin] = useState("");
     const [error, setError] = useState("");
+    const [cargando, setCargando] =useState(false)
 
     const calcularDuracion = () => {
-        const segundos = (t) => {
-            const [h, m, s = "0"] = t.split(":").map(Number);
+        const parseTime = (t) => {
+            if (!t) return 0;
+            const parts = t.split(":").map(Number);
+            let h = parts[0] || 0;
+            let m = parts[1] || 0;
+            let s = parts[2] || 0;
             return h * 3600 + m * 60 + s;
         };
 
-        const inicial = segundos(inicio);
-        const final = segundos(fin);
+        let inicial = parseTime(inicio);
+        let final = parseTime(fin);
 
         if (final <= inicial) {
-            if (inicial < 12) return null;
-            return contabilizarHoras((final + 12) - (inicial - 12))
-        };
+            final += 24 * 3600;
+        }
 
         return contabilizarHoras(final - inicial);
     }
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        setCargando(true)
         setError("");
 
         if (!fecha || !inicio || !fin) {
@@ -49,7 +55,12 @@ const FormAgregarJornada = ({ cerrar, guardar }) => {
         });
 
         cerrar();
+        setTimeout(() => {
+            setCargando(false);
+        }, 700);
     }
+
+    if (cargando) return <PantallaCarga />
 
     return (
         <div className="modal-jornada">
