@@ -54,7 +54,7 @@ export default function User() {
         const flag = await verificarDistancia();
         // traer contador de ubicacion fuera de rango y sumarle el actual
         let contadorUbicacion = Number(localStorage.getItem("flagDistancia") || 0) + Number(flag || 0);
-        const mensaje = contadorUbicacion > 2 ? `Ubicacion no permitida` : contadorUbicacion > 0 ? `Distancia fuera de rango (300m) en ${contadorUbicacion} ocasión(es).` : "Ubicacion correcta";
+        const mensaje = contadorUbicacion > 2 ? `Ubicacion no permitida` : contadorUbicacion > 0 ? `Fuera de rango en ${contadorUbicacion} ocasión(es).` : "Ubicacion correcta";
 
         // Guardar en Firestore
         try {
