@@ -4,6 +4,7 @@ import { db } from "../../services/firebase";
 import { collection, addDoc } from "firebase/firestore";
 import { formatearTiempo, obtenerTiempoActualEnSegundos, contabilizarHoras } from "../../helpers/time.helpers";
 import useGeoLocation from "../../hooks/useGeoLocation";
+import PantallaCarga from "../layout/PantallaCarga";
 
 const COORDENADAS_CLUB = {
     latitud: -31.369203,
@@ -13,6 +14,8 @@ const COORDENADAS_CLUB = {
 export default function User() {
     const { user } = useAuth();
     const { flagDistancia, verificarDistancia } = useGeoLocation(COORDENADAS_CLUB);
+    const [cargando, setCargando] = useState(false)
+    const [tiempo, setTiempo] = useState(0);
 
     //! Cambiar por objeto en forage
     const [inicioTs, setInicioTs] = useState(
@@ -20,8 +23,6 @@ export default function User() {
             ? Number(localStorage.getItem("inicioTs"))
             : null
     );
-
-    const [tiempo, setTiempo] = useState(0);
 
     // Actualizar el tiempo transcurrido cada segundo // Se reinicia al cambiar inicioTs(cambio jornada)
     useEffect(() => {
@@ -49,12 +50,14 @@ export default function User() {
 
     // Finalizar jornada
     const finalizarJornada = async () => {
+        setCargando(true);
+
         const finTs = Date.now();
         // obtener ubicacion y verificar geolocation
         const flag = await verificarDistancia();
         // traer contador de ubicacion fuera de rango y sumarle el actual
         let contadorUbicacion = Number(localStorage.getItem("flagDistancia") || 0) + Number(flag || 0);
-        const mensaje = contadorUbicacion > 2 ? `Ubicacion no permitida` : contadorUbicacion > 0 ? `Fuera de rango en ${contadorUbicacion} ocasión(es).` : "Ubicacion correcta";
+        const mensaje = contadorUbicacion > 2 ? `Ubicacion no permitida` : contadorUbicacion > 0 ? `Fuera de rango en ${contadorUbicacion} ocasión(es).` : "ubicacion correcta";
 
         // Guardar en Firestore
         try {
@@ -74,12 +77,17 @@ export default function User() {
         catch (e) {
             alert("Error al guardar la jornada: " + e.message);
         }
+        finally {
+            setCargando(false)
+        }
     };
+
+    if (cargando) return <PantallaCarga />
 
     return (
         <div className="circulo-jornada">
             <h2>{inicioTs ? "Jornada corriendo" : "Iniciar jornada"}</h2>
-            <button onClick={inicioTs ? finalizarJornada : iniciarJornada}>
+            <button onClick={inicioTs ? finalizarJornada : iniciarJornada} disabled={cargando}>
                 {inicioTs ? "Finalizar ⏸️" : "Iniciar ▶️"}
             </button>
             <p>
