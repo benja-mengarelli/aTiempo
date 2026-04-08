@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { contabilizarHoras } from "../../helpers/time.helpers";
+import { contabilizarHoras, calcularDuracion } from "../../helpers/time.helpers";
 import PantallaCarga from "../layout/PantallaCarga";
 
 const FormAgregarJornada = ({ cerrar, guardar }) => {

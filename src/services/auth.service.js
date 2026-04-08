@@ -15,7 +15,7 @@ export const register = async (nombre, email, pass, imagen) => {
         nombre: nombre,
         rol: "usuario",  // rol por defecto
         imagen: imagen,
-        estado: "activo"
+        activo: true
     });
     return cred;
 };
