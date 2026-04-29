@@ -28,9 +28,11 @@ export default function HorasPorMes({ filtradas, total, datos, abrirForm, elimin
                                 <td >{h.duracion}</td>
                                 <td style={{ backgroundColor: h.mensaje == "ubicacion correcta" ? "var(--secundario)" : h.mensaje == "jornada agregada" ? "var(--medio)" : "var(--incorrecto)" }}>{h.mensaje}</td>
                                 {datos?.rol === "admin" &&
+                                <td>
                                     <button onClick={() => eliminarJornada(h.id)}>
                                         ⛔
                                     </button>
+                                </td>
                                 }
                             </tr>
                         ))}

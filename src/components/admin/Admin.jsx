@@ -3,6 +3,9 @@ import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
 import PantallaCarga from "../layout/PantallaCarga";
 import { useUsuarios } from "../../hooks/useUsuarios";
+import { Timestamp } from "firebase/firestore";
+import { collection, getDocs, updateDoc } from "firebase/firestore";
+import { db } from "../../services/firebase";
 
 
 export function Admin({ datos }) {
@@ -19,19 +22,19 @@ export function Admin({ datos }) {
     return (
         <div className="lista-usuarios">
             {usuarios
-            .filter(u => u.rol === "usuario")
-            .filter(u => u.activo !== false)
-            .map((u) => (
-                <div key={u.id} className="usuario-card">
-                    <Link to={`/admin/${u.id}`} className="usuario-item" >
-                        <img src={u.imagen} alt={u.nombre}/>
-                    </Link>
+                .filter(u => u.rol === "usuario")
+                .filter(u => u.activo !== false)
+                .map((u) => (
+                    <div key={u.id} className="usuario-card">
+                        <Link to={`/admin/${u.id}`} className="usuario-item" >
+                            <img src={u.imagen} alt={u.nombre} />
+                        </Link>
 
-                    <h3>{u.nombre}</h3>
+                        <h3>{u.nombre}</h3>
 
-                    <button className="eliminar-usuario" onClick={() => eliminarUsuario(u.id) }>⛔</button>                   
-                </div>
-            ))}
+                        <button className="eliminar-usuario" onClick={() => eliminarUsuario(u.id)}>⛔</button>
+                    </div>
+                ))}
         </div>
     );
 }

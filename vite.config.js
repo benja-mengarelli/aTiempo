@@ -8,9 +8,13 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icon-192.png', 'icon-512.png', 'icon-180.png',
-    'icon-167.png',
-    'icon-152.png'],
+      includeAssets: [
+        'img/icono-192.png',
+        'img/icono-512.png',
+        'img/icono-180-ios.png',
+        'img/icono-167-ios.png',
+        'img/icono-152-ios.png'
+      ],
       manifest: {
         name: 'A tiempo',
         short_name: 'A tiempo',
@@ -21,8 +25,9 @@ export default defineConfig({
         background_color: '#0f172a',
         theme_color: '#0f172a',
         icons: [
-          { src: '/icono-192.png', sizes: '192x192', type: 'image/png' },
-          { src: '/icono-512.png', sizes: '512x512', type: 'image/png' }
+          { src: '/img/icono-192.png', sizes: '192x192', type: 'image/png' },
+          { src: '/img/icono-512.png', sizes: '512x512', type: 'image/png' },
+          { src: "/img/icono-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
         ]
       }
     })
