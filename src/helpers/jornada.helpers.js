@@ -42,7 +42,6 @@ export function horasFiltradas (jornadas, mesSeleccionado) {
         
         const [year, month] = fechaParts;
         const mesJornada = `${year}-${month}`;
-        console.log("Comparing:", mesJornada, "with", mesSeleccionado, "Match:", mesJornada === mesSeleccionado);
         return mesJornada === mesSeleccionado;
     })
 }

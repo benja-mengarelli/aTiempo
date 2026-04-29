@@ -2,6 +2,7 @@ import LoginPopUp from '../components/auth/Login';
 import { Navbar } from '../components/layout/Navbar';
 import { Admin } from "../components/admin/Admin";
 import  User  from "../components/user/User";
+import { SuperUser } from '../components/superUser/SuperUser';
 import { useAuth } from '../context/AuthContext';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import MisHoras from '../components/user/MisHoras';
@@ -21,7 +22,7 @@ function App() {
       
       <Routes>
 
-        <Route path='/' element= {datos?.rol === "admin"? <Admin datos= {{...datos}}/>  : <User/> } />
+        <Route path='/' element= {datos?.rol === "admin"? <Admin datos= {{...datos}}/>  : datos?.rol === "superAdmin" ? <SuperUser datos= {{...datos}}/> : <User/> } />
         <Route path='/admin/:id' element= {<VerHoras />} />
         <Route path='/user/:id' element= {<MisHoras/>} />
         
