@@ -3,7 +3,7 @@ import { db } from '../services/firebase';
 import { collection, addDoc, deleteDoc, doc } from 'firebase/firestore';
 import { query, orderBy, onSnapshot, getDocs, where } from 'firebase/firestore';
 
-// Get jornadas (with snapshot listener)
+// Get jornadas (with snapshot listener) agrega escucha a cambios en tiempo real
 export function subscribeJornadas(userId, onData, onError) {
   if (!userId) return () => {};
   const q = query(collection(db, 'users', userId, 'jornadas'), orderBy('fecha', 'desc'));
@@ -20,7 +20,7 @@ export function subscribeJornadas(userId, onData, onError) {
   return unsubscribe;
 }
 
-// Get jornadas (one-time fetch)
+// !! ya esta en back 
 export async function getJornadas(userId) {
   //Cambio de query para que lea solo las no expiradas
   const hoy = new Date();
@@ -45,7 +45,7 @@ export async function eliminarJornada(userId, jornadaId) {
   return deleteDoc(ref);
 }
 
-//! Implementar para el superUser, limpieza ocasional
+//! ya esta en back
 export async function EliminarJornadasExpiradas(userId) {
   const hoy = new Date();
   const q = query(

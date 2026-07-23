@@ -48,7 +48,10 @@ export default function User() {
         const flag = await verificarDistancia();
         try {
             const docref = await addDoc(collection(db, "users", user.uid, "jornadas"), {
-                fecha: new Date(ts).toISOString().slice(0, 10),
+                fecha: new Date(ts).toLocaleDateString("sv-SE", { timeZone: "America/Argentina/Cordoba" }),
+                diaSemana: new Date(ts).toLocaleDateString("es-AR", { weekday: "long", timeZone: "America/Argentina/Cordoba" }),
+                numeroDia: new Date(ts).getDate(),
+                numeroDiaSemana: new Date(ts).getDay(),
                 inicio: new Date(ts).toLocaleTimeString(),
                 fin: null,
                 duracion: null,
@@ -111,6 +114,15 @@ export default function User() {
                 });
             } else {
                 const docRef = doc(db, "users", user.uid, "jornadas", jornadaId);
+                if (!docRef) {
+                    //limpiar estado corrupto
+                    setInicioTs(null);
+                    localStorage.removeItem("inicioTs");
+                    localStorage.removeItem("flagDistancia");
+                    localStorage.removeItem("jornadaId");
+                    alert("No se encontró la jornada para finalizar. Se ha reseteado el estado. Por favor, intenta iniciar y finalizar la jornada nuevamente.");
+                    throw new Error("No se encontró la jornada para finalizar.");
+                }
                 await updateDoc(docRef, {
                     fin: new Date(finTs).toLocaleTimeString(),
                     duracion: contabilizarHoras((finTs - inicioTs) / 1000),
@@ -128,6 +140,13 @@ export default function User() {
         }
         catch (e) {
             alert("Error al guardar la jornada: " + e.message);
+            //limpiar estado corrupto
+            setInicioTs(null);
+            setTiempo(0);
+            localStorage.removeItem("inicioTs");
+            localStorage.removeItem("flagDistancia");
+            localStorage.removeItem("jornadaId");
+            console.log("Error al finalizar jornada:", e);
         }
         finally {
             setCargando(false)

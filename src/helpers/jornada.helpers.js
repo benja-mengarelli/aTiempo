@@ -29,21 +29,33 @@ export function getMesesDisponibles(fechaInicio) {
 }
 
 
-export function horasFiltradas (jornadas, mesSeleccionado) {
-    // Si no hay mes seleccionado, retornar todas las jornadas
-    if (!mesSeleccionado) return jornadas;
-    
-    // Filtrar jornadas por mes seleccionado (formato "YYYY-MM")
-    return jornadas.filter(jornada => {
-        // Parse fecha string "YYYY-MM-DD" (from ISO format) or "YYYY/MM/DD"
-        const fechaParts = jornada.fecha.includes('-') 
-            ? jornada.fecha.split('-') 
-            : jornada.fecha.split('/');
-        
-        const [year, month] = fechaParts;
-        const mesJornada = `${year}-${month}`;
-        return mesJornada === mesSeleccionado;
-    })
+// dias para horas filtradas
+const dias = {
+    lunes: "Lun",
+    martes: "Mar",
+    miércoles: "Mié",
+    jueves: "Jue",
+    viernes: "Vie",
+    sábado: "Sáb",
+    domingo: "Dom",
+}
+
+export function horasFiltradas(jornadas, mesSeleccionado) {
+    const filtradas = !mesSeleccionado
+        ? jornadas
+        : jornadas.filter(jornada => {
+            const fechaParts = jornada.fecha.includes('-')
+                ? jornada.fecha.split('-')
+                : jornada.fecha.split('/');
+
+            const [year, month] = fechaParts;
+            return `${year}-${month}` === mesSeleccionado;
+        });
+
+    return filtradas.map(jornada => ({
+        ...jornada,
+        fechaCorta: `${dias[jornada.diaSemana] ?? ""} ${jornada.fecha.slice(8, 10)}/${jornada.fecha.slice(5, 7)}`
+    }));
 }
 
 export function agruparPor15Dias(horas) {
