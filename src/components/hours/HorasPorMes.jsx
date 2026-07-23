@@ -23,7 +23,7 @@ export default function HorasPorMes({ filtradas, total, datos, abrirForm, elimin
                     <tbody>
                         {filtradas.map((h) => (
                             <tr key={h.id} style={{ backgroundColor: "var(--bg-card)" }} >
-                                <td >{h.fecha}</td>
+                                <td ><strong>{h.fechaCorta}</strong></td>
                                 <td >{h.inicio} - {h.fin}</td>
                                 <td >{h.duracion}</td>
                                 <td style={{ backgroundColor: h.mensaje == "ubicacion correcta" ? "var(--secundario)" : h.mensaje == "jornada agregada" ? "var(--medio)" : "var(--incorrecto)" }}>{h.mensaje}</td>
