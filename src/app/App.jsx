@@ -8,10 +8,27 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import MisHoras from '../components/user/MisHoras';
 import VerHoras from '../components/admin/VerHoras';
 import PantallaCarga from '../components/layout/PantallaCarga';
+import { useEffect } from 'react';
+import { useRegisterSW } from 'virtual:pwa-register/react';
 
 function App() {
 
   const {user, datos, cargando, logout} = useAuth();
+
+  // verificar v nueva
+  const { needRefresh, updateServiceWorker } = useRegisterSW();
+  
+  useEffect( () => {
+    const jornadaActiva = localStorage.getItem("inicioTs");
+
+    if (needRefresh && !jornadaActiva) {
+      
+        updateServiceWorker(true);
+      
+    }
+  }, [needRefresh, updateServiceWorker]);
+
+
 
   if (cargando) return <PantallaCarga />;
   if (!user) return <LoginPopUp />;

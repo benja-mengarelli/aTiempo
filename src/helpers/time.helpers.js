@@ -50,21 +50,31 @@ export const obtenerTiempoActualEnSegundos = (inicioTimer) => {
 
 // Calcular duracion segs
 export const calcularDuracion = (inicio, fin) => {
-        const parseTime = (t) => {
-            if (!t) return 0;
-            const parts = t.split(":").map(Number);
-            let h = parts[0] || 0;
-            let m = parts[1] || 0;
-            let s = parts[2] || 0;
-            return h * 3600 + m * 60 + s;
-        };
+    const parseTime = (t) => {
+        if (!t) return 0;
+        const parts = t.split(":").map(Number);
+        let h = parts[0] || 0;
+        let m = parts[1] || 0;
+        let s = parts[2] || 0;
+        return h * 3600 + m * 60 + s;
+    };
 
-        let inicial = parseTime(inicio);
-        let final = parseTime(fin);
+    let inicial = parseTime(inicio);
+    let final = parseTime(fin);
 
-        if (final <= inicial) {
-            final += 24 * 3600;
-        }
-
-        return contabilizarHoras(final - inicial);
+    if (final <= inicial) {
+        final += 24 * 3600;
     }
+
+    return contabilizarHoras(final - inicial);
+}
+
+export function formatearHorasDecimal(valor) {
+
+    const horas = Math.floor(valor);
+
+    const minutos = Math.round((valor - horas) * 60);
+
+    return `${horas}h ${String(minutos).padStart(2, "0")}m`;
+
+}
