@@ -39,7 +39,7 @@ export default function HorasPor15Dias({ agrupadas, datos, abrirForm, eliminarJo
                             {agrupadas.segunda15.map((h) => (
                                 <li key={h.id}>
                                     <div style={{ backgroundColor: h.mensaje == "ubicacion correcta" ? "var(--secundario)" : h.mensaje == "jornada agregada" ? "var(--medio)" : "var(--incorrecto)" }}>
-                                        <strong>{h.fecha}</strong> - {h.inicio} a {h.fin} ({h.duracion})
+                                        <strong>{h.fechaCorta}</strong> - {h.inicio} a {h.fin} ({h.duracion})
                                         <br />
                                         <small>{h.mensaje}</small>
                                     </div>

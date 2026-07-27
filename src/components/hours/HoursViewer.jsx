@@ -6,6 +6,10 @@ import HorasPor15Dias from './HorasPor15Dias';
 import HorasPorSemana from './HorasPorSemana';
 import FormAgregarJornada from '../admin/FormAgregarJornada';
 import PantallaCarga from '../layout/PantallaCarga';
+import  HorasPorDiaSemana  from "../graficos/HorasPorDiaSemana";
+import  CardsResumen from "../graficos/CardsResumen";
+import  EvolucionMensual from "../graficos/EvolucionMensual";
+import  JornadasPorDiaSemana from "../graficos/JornadasPorDia";
 
 export default function HoursViewer({ userId, initialMonth, initialView }) {
     const {
@@ -112,6 +116,13 @@ export default function HoursViewer({ userId, initialMonth, initialView }) {
                         eliminarJornada={eliminarJornada}
                     />
                 )}
+            </div>
+            
+            <div className="dashboard-graficos"> 
+                <CardsResumen jornadas={filtradas} />
+                <EvolucionMensual jornadas={filtradas} />
+                <HorasPorDiaSemana jornadas={filtradas} />
+                <JornadasPorDiaSemana jornadas={filtradas} />
             </div>
 
             {mostrarForm && (

@@ -48,6 +48,11 @@ const FormAgregarJornada = ({ cerrar, guardar }) => {
 
         guardar({
             fecha,
+            diaSemana: new Date(fecha).toLocaleDateString("es-AR", { weekday: "long", timeZone: "America/Argentina/Cordoba" }),
+            numeroDia: new Date(fecha).getDate(),
+            numeroDiaSemana: new Date(fecha).getDay(),
+            activo: false,
+            expiracion: new Date(fecha).setMonth(new Date(fecha).getMonth() + 7),
             inicio,
             fin,
             duracion,
