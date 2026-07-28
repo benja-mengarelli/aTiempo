@@ -5,12 +5,16 @@ import { getMesesDisponibles, horasFiltradas, agruparPor15Dias, agruparPorSemana
 import { agregarJornada, eliminarJornada as eliminarJornadaService } from '../services/jornadas.service';
 
 export default function useJornadasViewer({ userId, initialMonth, initialView }) {
+
+    const { datos } = useAuth();
+
     const FECHA_INICIO = new Date('2026-01-01');
-    const { jornadas, loading } = useJornadas(userId);
     const meses = getMesesDisponibles(FECHA_INICIO);
     const [mes, setMes] = useState(initialMonth || (meses[0] && meses[0].value) || '');
+
+    const { jornadas, loading } = useJornadas(userId);
+    
     const [tipoVisualizacion, setTipoVisualizacion] = useState(initialView || 'mes');
-    const { datos } = useAuth();
     const [mostrarForm, setMostrarForm] = useState(false);
 
     const abrirForm = () => setMostrarForm(true);

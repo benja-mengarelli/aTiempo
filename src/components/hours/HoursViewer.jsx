@@ -6,10 +6,10 @@ import HorasPor15Dias from './HorasPor15Dias';
 import HorasPorSemana from './HorasPorSemana';
 import FormAgregarJornada from '../admin/FormAgregarJornada';
 import PantallaCarga from '../layout/PantallaCarga';
-import  HorasPorDiaSemana  from "../graficos/HorasPorDiaSemana";
-import  CardsResumen from "../graficos/CardsResumen";
-import  EvolucionMensual from "../graficos/EvolucionMensual";
-import  JornadasPorDiaSemana from "../graficos/JornadasPorDia";
+import HorasPorDiaSemana from "../graficos/HorasPorDiaSemana";
+import CardsResumen from "../graficos/CardsResumen";
+import EvolucionMensual from "../graficos/EvolucionMensual";
+import JornadasPorDiaSemana from "../graficos/JornadasPorDia";
 
 export default function HoursViewer({ userId, initialMonth, initialView }) {
     const {
@@ -36,7 +36,6 @@ export default function HoursViewer({ userId, initialMonth, initialView }) {
 
     return (
         <div className="mis-horas">
-            {/* Filtros */}
             <div className="filtros">
                 <div className="visualizacion-fechas">
                     {meses.map(m => (
@@ -89,7 +88,6 @@ export default function HoursViewer({ userId, initialMonth, initialView }) {
                 </div>
 
             </div>
-
             <div>
                 {tipoVisualizacion === 'mes' && (
                     <HorasPorMes
@@ -117,8 +115,9 @@ export default function HoursViewer({ userId, initialMonth, initialView }) {
                     />
                 )}
             </div>
-            
-            <div className="dashboard-graficos"> 
+
+
+            <div className="dashboard-graficos">
                 <CardsResumen jornadas={filtradas} />
                 <EvolucionMensual jornadas={filtradas} />
                 <HorasPorDiaSemana jornadas={filtradas} />
