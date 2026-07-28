@@ -40,12 +40,13 @@ export default function User() {
         const ts = Date.now();
         setInicioTs(ts);
         const expiracion = new Date();
-        expiracion.setMonth(expiracion.getMonth() + 7);
+        expiracion.setMonth(expiracion.getMonth() + 6);
         expiracion.setDate(1);
 
         // Hacer guardado en fb
         setCargando(true);
         const flag = await verificarDistancia();
+        
         try {
             const docref = await addDoc(collection(db, "users", user.uid, "jornadas"), {
                 fecha: new Date(ts).toLocaleDateString("sv-SE", { timeZone: "America/Argentina/Cordoba" }),

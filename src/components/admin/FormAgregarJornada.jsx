@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { contabilizarHoras, calcularDuracion } from "../../helpers/time.helpers";
 import PantallaCarga from "../layout/PantallaCarga";
+import { Timestamp } from "firebase/firestore";
 
 const FormAgregarJornada = ({ cerrar, guardar }) => {
     const [fecha, setFecha] = useState("");
@@ -46,13 +47,17 @@ const FormAgregarJornada = ({ cerrar, guardar }) => {
             return;
         }
 
+        const expiracion = new Date(fecha);
+        expiracion.setMonth(expiracion.getMonth() + 6)
+        expiracion.setDate(1)
+
         guardar({
             fecha,
             diaSemana: new Date(fecha).toLocaleDateString("es-AR", { weekday: "long", timeZone: "America/Argentina/Cordoba" }),
             numeroDia: new Date(fecha).getDate(),
             numeroDiaSemana: new Date(fecha).getDay(),
             activo: false,
-            expiracion: new Date(fecha).setMonth(new Date(fecha).getMonth() + 7),
+            expiracion: Timestamp.fromDate(expiracion),
             inicio,
             fin,
             duracion,

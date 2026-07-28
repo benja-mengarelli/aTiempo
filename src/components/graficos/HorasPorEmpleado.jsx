@@ -23,30 +23,52 @@ export default function HorasPorEmpleado({ jornadas }) {
         )
     ];
 
+    const COLORES = [
+        "#2563eb",
+        "#22c55e",
+        "#ef4444",
+        "#f97316",
+        "#8b5cf6",
+        "#06b6d4",
+        "#84cc16",
+        "#ec4899",
+        "#14b8a6",
+        "#facc15",
+    ];
+
     return (
-        <GraficoCard titulo="🕜 Horas por empleado"> 
+        <GraficoCard titulo="🕜 Horas por empleado">
             <ResponsiveContainer width="100%" height={350}>
 
                 <BarChart data={data}>
 
-                    <CartesianGrid strokeDasharray="3 3"/>
+                    <CartesianGrid strokeDasharray="3 3" />
 
-                    <XAxis dataKey="dia"/>
+                    <XAxis dataKey="dia" />
 
-                    <YAxis/>
+                    <YAxis
+                        label={{
+                            value: "Horas",
+                            angle: -90,
+                            position: "insideLeft"
+                        }}
+                    />
 
-                    <Tooltip/>
+                    <Tooltip />
 
-                    <Legend/>
+                    <Legend />
 
                     {
 
-                        empleados.map(nombre => (
+                        empleados.map((nombre, index) => (
 
                             <Bar
                                 key={nombre}
                                 dataKey={nombre}
                                 stackId="a"
+                                fill={COLORES[index % COLORES.length]}
+                                radius={[4, 4, 0, 0]}
+                                animationDuration={700}
                             />
 
                         ))
@@ -56,7 +78,7 @@ export default function HorasPorEmpleado({ jornadas }) {
                 </BarChart>
 
             </ResponsiveContainer>
-        
+
         </GraficoCard>
 
     );
