@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import MisHoras from '../components/user/MisHoras';
 import VerHoras from '../components/admin/VerHoras';
+import Rosco from "../components/juegos/Rosco"
 import PantallaCarga from '../components/layout/PantallaCarga';
 import { useEffect } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
@@ -42,6 +43,7 @@ function App() {
         <Route path='/' element= {datos?.rol === "admin"? <Admin datos= {{...datos}}/>  : datos?.rol === "superAdmin" ? <SuperUser datos= {{...datos}}/> : <User/> } />
         <Route path='/admin/:id' element= {<VerHoras />} />
         <Route path='/user/:id' element= {<MisHoras/>} />
+        <Route path='/juego' element= {<Rosco/>} />
         
       </Routes>
     </BrowserRouter>

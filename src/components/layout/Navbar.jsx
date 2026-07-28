@@ -29,6 +29,8 @@ export function Navbar({ user, onlogout }) {
 
                 {user?.rol === "usuario" && (
                     <Link to={`/user/${user.uid}`} className="btn-mis-horas">Mis Horas</Link>
+                ) && (
+                    <button> <Link to={`/juego`} >🕹️</Link> </button>
                 )}
                 <button onClick={handleThemeToggle} aria-label="Cambiar tema">
                     {darkMode ? "🌙" : "☀️"}
