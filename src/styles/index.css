@@ -806,3 +806,182 @@ footer {
     bottom: 0;
     width: 100%;
 }
+
+
+/*! JUEGOS ROSCO */
+
+@keyframes flash {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        box-shadow: 0 0 0px gold;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.25);
+        box-shadow: 0 0 18px gold;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        box-shadow: 0 0 0px gold;
+    }
+}
+
+/* ---------- Layout ---------- */
+.pantalla-rosco,
+.fin-juego{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:25px;
+    padding:25px;
+    background:#f4f4f4;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+/* ---------- Temporizador ---------- */
+.temporizador{
+    font-size:2rem;
+    font-weight:bold;
+    color:#1d4ed8;
+}
+
+.temporizador.alerta{
+    color:#dc2626;
+}
+
+/* ---------- Círculo ---------- */
+.circulo{
+    position:relative;
+    width:420px;
+    height:420px;
+}
+
+/* ---------- Letras ---------- */
+.letter{
+    position:absolute;
+    width:42px;
+    height:42px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    transform:translate(-50%, -50%);
+    border-radius:50%;
+    background:#9ca3af;
+    color:white;
+    font-weight:bold;
+    transition:.25s;
+}
+
+/* ---------- Estados ---------- */
+.letter.correcto{
+    background:#16a34a;
+}
+
+.letter.incorrecto{
+    background:#dc2626;
+}
+
+.letter.pendiente{
+    background:#9ca3af;
+}
+
+/* si decidís mantener pasapalabra */
+.letter.pasapalabra{
+    background:#facc15;
+    color:#222;
+}
+
+/* ---------- Letra actual ---------- */
+.letter.activa{
+    border:4px solid #2563eb;
+    animation:flash .8s infinite;
+    z-index:2;
+}
+
+/* ---------- Tarjeta ---------- */
+.pregunta-actual{
+    width:min(650px,100%);
+    background:white;
+    border-radius:15px;
+    padding:25px;
+    box-shadow:0 4px 12px rgba(0,0,0,.15);
+}
+
+.pregunta-actual h2{
+    margin-bottom:15px;
+}
+
+.pregunta-actual p{
+    font-size:1.2rem;
+}
+
+/* ---------- Botones ---------- */
+.botones-juego{
+    display:flex;
+    gap:15px;
+    flex-wrap:wrap;
+    justify-content:center;
+}
+
+.botones-juego button{
+    padding:12px 20px;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+    font-size:1rem;
+    font-weight:bold;
+}
+
+.botones-juego button:hover{
+    transform:translateY(-2px);
+}
+
+/* ---------- Responsive ---------- */
+@media(max-width:600px){
+    .circulo{
+        width:300px;
+        height:300px;
+    }
+
+    .letter{
+        width:32px;
+        height:32px;
+        font-size:.9rem;
+    }
+
+    .pregunta-actual{
+        padding:18px;
+    }
+
+    .botones-juego{
+        width:100%;
+        flex-direction:column;
+    }
+
+    .botones-juego button{
+        width:100%;
+    }
+}
+
+.btn-centro{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    width:130px;
+    height:130px;
+    border-radius:50%;
+    border:none;
+    background:#2563eb;
+    color:white;
+    font-size:1.1rem;
+    font-weight:bold;
+    cursor:pointer;
+    z-index:10;
+    transition:.25s;
+}
+
+.btn-centro:hover{
+    transform:translate(-50%,-50%) scale(1.08);
+}
