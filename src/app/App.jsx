@@ -29,8 +29,7 @@ function App() {
     }
   }, [needRefresh, updateServiceWorker]);
 
-
-
+  
   if (cargando) return <PantallaCarga />;
   if (!user) return <LoginPopUp />;
 

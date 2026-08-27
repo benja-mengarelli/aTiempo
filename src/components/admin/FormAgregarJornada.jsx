@@ -51,7 +51,7 @@ const FormAgregarJornada = ({ cerrar, guardar }) => {
         expiracion.setMonth(expiracion.getMonth() + 6)
         expiracion.setDate(1)
 
-        guardar({
+        const payload = {
             fecha,
             diaSemana: new Date(fecha).toLocaleDateString("es-AR", { weekday: "long", timeZone: "America/Argentina/Cordoba" }),
             numeroDia: new Date(fecha).getDate(),
@@ -61,8 +61,10 @@ const FormAgregarJornada = ({ cerrar, guardar }) => {
             inicio,
             fin,
             duracion,
-            mensaje: "jornada agregada"
-        });
+            mensaje: "jornada agregada",
+        }
+
+        guardar({payload});
 
         cerrar();
         setTimeout(() => {

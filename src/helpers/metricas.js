@@ -112,3 +112,28 @@ export function totalHorasEmpleado(jornadas) {
         }))
         .sort((a, b) => b.horas - a.horas);
 }
+
+export function stdDeviation(values) {
+    if (!values.length) return 0;
+
+    const mean =
+        values.reduce((a, b) => a + b, 0) / values.length;
+
+    const variance =
+        values.reduce((sum, value) => {
+            return sum + Math.pow(value - mean, 2);
+        }, 0) / values.length;
+
+    return Math.sqrt(variance);
+}
+
+export function coefficientVariation(values) {
+    if (values.length <= 1) return 0;
+
+    const mean =
+        values.reduce((a, b) => a + b, 0) / values.length;
+
+    if (mean === 0) return 0;
+
+    return stdDeviation(values) / mean;
+}

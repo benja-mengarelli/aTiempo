@@ -1,11 +1,11 @@
 import React from 'react';
 
-export default function HorasPor15Dias({ agrupadas, datos, abrirForm, eliminarJornada }) {
+export default function HorasPor15Dias({ agrupadas, rolActual, abrirForm, eliminarJornada }) {
     return (
-        <div className={datos?.rol === "admin"? "registro-15-dias admin" : "registro-15-dias usuario"}>
+        <div className={rolActual === "admin"? "registro-15-dias admin" : "registro-15-dias usuario"}>
             <div className='header-registro'>
                 <h3>Registros por 15 días</h3>
-                {datos?.rol === "admin" && <button onClick={abrirForm} className='btn-agregar-jornada'>Agregar jornada </button>}
+                {rolActual === "admin" && <button onClick={abrirForm} className='btn-agregar-jornada'>Agregar jornada </button>}
             </div>
             <div className='registro-15-dias-contenedor'>
                 <div className='quincenas'>
@@ -21,7 +21,7 @@ export default function HorasPor15Dias({ agrupadas, datos, abrirForm, eliminarJo
                                         <br />
                                         <small>{h.mensaje}</small>
                                     </div>
-                                    {datos?.rol === "admin" &&
+                                    {rolActual === "admin" &&
                                         <button onClick={() => eliminarJornada(h.id)}>
                                             ⛔
                                         </button>}
@@ -43,7 +43,7 @@ export default function HorasPor15Dias({ agrupadas, datos, abrirForm, eliminarJo
                                         <br />
                                         <small>{h.mensaje}</small>
                                     </div>
-                                    {datos?.rol === "admin" &&
+                                    {rolActual === "admin" &&
                                         <button onClick={() => eliminarJornada(h.id)}>
                                             ⛔
                                         </button>}

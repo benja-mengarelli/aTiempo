@@ -17,7 +17,7 @@ export default function useGeoLocation(COORDENADAS_CLUB, distanciaMax = 300) {
 
             const flag = distanciaActual > distanciaMax ? 1 : 0;
             setFlagDistancia(flag);
-            return flag; // Return the computed value immediately
+            return flag; 
         } catch (e) {
             console.error("Error al obtener ubicación:", e);
             setFlagDistancia(3); // Asumir fuera de rango si no se puede obtener ubicación

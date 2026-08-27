@@ -5,11 +5,11 @@ import PantallaCarga from "../layout/PantallaCarga";
 
 export default function VerHoras() {
     const { id } = useParams();
-    const { user, datos, cargando } = useAuth();
+    const { user, rolActual, cargando } = useAuth();
 
     if (cargando) return <PantallaCarga />;
 
-    if (!user || !id || datos.rol !== "admin") {
+    if (!user || !id || rolActual !== "admin") {
         alert("No tienes permiso para ver esta pagina")
         return <Navigate to="/" replace/>
     }

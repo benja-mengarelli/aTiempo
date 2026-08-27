@@ -4,9 +4,14 @@ import { collection, addDoc, deleteDoc, doc } from 'firebase/firestore';
 import { query, orderBy, onSnapshot, getDocs, where } from 'firebase/firestore';
 
 // Get jornadas (with snapshot listener) agrega escucha a cambios en tiempo real
-export function subscribeJornadas(userId, onData, onError) {
-  if (!userId) return () => {};
-  const q = query(collection(db, 'users', userId, 'jornadas'), orderBy('fecha', 'desc'));
+export function subscribeJornadas(empresaId, userId, onData, onError) {
+  if (!userId || !empresaId) return () => {};
+
+  const q = query(
+    collection(db, 'empresas', empresaId, 'jornadas'),
+    where('uid', '==', userId),
+    orderBy('fecha', 'desc')    
+  );
   const unsubscribe = onSnapshot(
     q,
     (snapshot) => {
@@ -20,42 +25,27 @@ export function subscribeJornadas(userId, onData, onError) {
   return unsubscribe;
 }
 
-// !! ya esta en back 
-export async function getJornadas(userId) {
+export async function getJornadas(empresaId, userId) {
   //Cambio de query para que lea solo las no expiradas
   const hoy = new Date();
   const q = query(
-    collection(db, 'users', userId, 'jornadas'),
+    collection(db, 'empresas', empresaId, 'jornadas'),
+    where('uid', '==', userId),
     where('expiracion', '>', hoy),
     orderBy('fecha', 'desc')
   );
-  /* const q = query(collection(db, 'users', userId, 'jornadas'), orderBy('fecha', 'desc')); */
   
   const snap = await getDocs(q);
   return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 }
 
-export async function agregarJornada(userId, jornada) {
-  const ref = collection(db, 'users', userId, 'jornadas');
+export async function agregarJornada(empresaId, userId, jornada) {
+  const ref = collection(db, 'empresas', empresaId, 'jornadas');
   return addDoc(ref, jornada);
 }
 
-export async function eliminarJornada(userId, jornadaId) {
-  const ref = doc(db, 'users', userId, 'jornadas', jornadaId);
+export async function eliminarJornada(empresaId, jornadaId) {
+  const ref = doc(db, 'empresas', empresaId, 'jornadas', jornadaId);
   return deleteDoc(ref);
 }
 
-//! ya esta en back
-export async function EliminarJornadasExpiradas(userId) {
-  const hoy = new Date();
-  const q = query(
-    collection(db, 'users', userId, 'jornadas'),
-    where('expiracion', '<=', hoy)
-  );
-  const snap = await getDocs(q);
-  const batch = db.batch();
-  snap.docs.forEach((doc) => {
-    batch.delete(doc.ref);
-  });
-  await batch.commit();
-}

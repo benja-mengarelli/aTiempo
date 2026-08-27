@@ -22,6 +22,7 @@ export default function HoursViewer({ userId, initialMonth, initialView }) {
         setMostrarForm,
         loading,
         datos,
+        rolActual,
         filtradas,
         agrupadas,
         semanas,
@@ -93,7 +94,7 @@ export default function HoursViewer({ userId, initialMonth, initialView }) {
                     <HorasPorMes
                         filtradas={filtradas}
                         total={total}
-                        datos={datos}
+                        rolActual={rolActual}
                         abrirForm={abrirForm}
                         eliminarJornada={eliminarJornada}
                     />
@@ -101,7 +102,7 @@ export default function HoursViewer({ userId, initialMonth, initialView }) {
                 {tipoVisualizacion === '15dias' && (
                     <HorasPor15Dias
                         agrupadas={agrupadas}
-                        datos={datos}
+                        rolActual={rolActual}
                         abrirForm={abrirForm}
                         eliminarJornada={eliminarJornada}
                     />
@@ -109,7 +110,7 @@ export default function HoursViewer({ userId, initialMonth, initialView }) {
                 {tipoVisualizacion === 'semanas' && (
                     <HorasPorSemana
                         semanas={semanas}
-                        datos={datos}
+                        rolActual={rolActual}
                         abrirForm={abrirForm}
                         eliminarJornada={eliminarJornada}
                     />

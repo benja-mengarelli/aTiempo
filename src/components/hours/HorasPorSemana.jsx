@@ -1,11 +1,11 @@
 import React from 'react';
 
-export default function HorasPorSemana({ semanas, datos, abrirForm, eliminarJornada }) {
+export default function HorasPorSemana({ semanas, rolActual, abrirForm, eliminarJornada }) {
     return (
-        <div className={datos?.rol === "admin"? "registro-por-semana admin" : "registro-por-semana usuario"}>
+        <div className={rolActual === "admin"? "registro-por-semana admin" : "registro-por-semana usuario"}>
             <div className='header-registro'>
                 <h3>Registros por semana</h3>
-                {datos?.rol === "admin" && <button onClick={abrirForm} className='btn-agregar-jornada'>Agregar jornada </button>}
+                {rolActual === "admin" && <button onClick={abrirForm} className='btn-agregar-jornada'>Agregar jornada </button>}
             </div>
             <div className='grid-semanal'>
                 {[semanas.semana1, semanas.semana2, semanas.semana3, semanas.semana4].map((semana, idx) => (
@@ -22,7 +22,7 @@ export default function HorasPorSemana({ semanas, datos, abrirForm, eliminarJorn
                                             <br />
                                             <small>{h.mensaje}</small>
                                         </div>
-                                        {datos?.rol === "admin" &&
+                                        {rolActual === "admin" &&
                                             <button onClick={() => eliminarJornada(h.id)}>
                                                 ⛔
                                             </button>}
