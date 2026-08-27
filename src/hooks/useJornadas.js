@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { subscribeJornadas, getJornadas } from '../services/jornadas.service';
 
-export default function useJornadas(userId) {
+export default function useJornadas(empresaId,userId) {
     const [jornadas, setJornadas] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     async function refresh() {
-        if (!userId) {
+        if (!userId || !empresaId) {
             setJornadas([]);
             setLoading(false);
             return;
@@ -15,7 +15,7 @@ export default function useJornadas(userId) {
 
         setLoading(true);
         try {
-            const data = await getJornadas(userId);
+            const data = await getJornadas(empresaId, userId);
             setJornadas(data);
         } catch (err) {
             setError(err);
@@ -25,7 +25,7 @@ export default function useJornadas(userId) {
     }
 
     useEffect(() => {
-        if (!userId) {
+        if (!userId || !empresaId) {
             setJornadas([]);
             setLoading(false);
             return;
@@ -33,6 +33,7 @@ export default function useJornadas(userId) {
 
         setLoading(true);
         const unsubscribe = subscribeJornadas(
+            empresaId,
             userId,
             (data) => {
                 setJornadas(data);

@@ -6,14 +6,14 @@ import { agregarJornada, eliminarJornada as eliminarJornadaService } from '../se
 
 export default function useJornadasViewer({ userId, initialMonth, initialView }) {
 
-    const { datos } = useAuth();
+    const { datos, rolActual, empresaActivaId } = useAuth();
 
     const FECHA_INICIO = new Date('2026-01-01');
     const meses = getMesesDisponibles(FECHA_INICIO);
     const [mes, setMes] = useState(initialMonth || (meses[0] && meses[0].value) || '');
 
-    const { jornadas, loading } = useJornadas(userId);
-    
+    const { jornadas, loading } = useJornadas(empresaActivaId, userId);
+
     const [tipoVisualizacion, setTipoVisualizacion] = useState(initialView || 'mes');
     const [mostrarForm, setMostrarForm] = useState(false);
 
@@ -21,12 +21,13 @@ export default function useJornadasViewer({ userId, initialMonth, initialView })
     const cerrarForm = () => setMostrarForm(false);
 
     const guardarJornada = async (jornada) => {
-        if (datos.rol !== "admin" || !datos) {
+        // rolActual ya es null si no hay empresa activa, no hace falta chequear !datos aparte
+        if (rolActual !== "admin") {
             alert("No tienes permiso de agregar");
             return;
         }
         try {
-            await agregarJornada(userId, jornada);
+            await agregarJornada(empresaActivaId, userId, jornada);
             console.log("Jornada agregada");
         } catch (e) {
             console.error("Error al agregar", e);
@@ -35,20 +36,19 @@ export default function useJornadasViewer({ userId, initialMonth, initialView })
     };
 
     const eliminarJornada = async (jornadaId) => {
-        if (datos.rol !== "admin" || !datos) {
+        if (rolActual !== "admin") {
             alert("No tienes permiso de eliminar");
             return;
         }
         if (window.confirm("¿Eliminar esta jornada?")) {
             try {
-                await eliminarJornadaService(userId, jornadaId);
+                await eliminarJornadaService(empresaActivaId, jornadaId);
                 console.log("Jornada eliminada");
             } catch (e) {
                 console.error("Error al eliminar jornada", e);
             }
         }
     };
-
     // Prepare props for each view
     const filtradas = horasFiltradas(jornadas, mes);
     const agrupadas = agruparPor15Dias(filtradas);
@@ -65,6 +65,7 @@ export default function useJornadasViewer({ userId, initialMonth, initialView })
         setMostrarForm,
         loading,
         datos,
+        rolActual,
         filtradas,
         agrupadas,
         semanas,

@@ -13,9 +13,12 @@ export const register = async (nombre, email, pass, imagen) => {
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     await setDoc(doc(db, "users", cred.user.uid), {
         nombre: nombre,
-        rol: "usuario",  // rol por defecto
         imagen: imagen,
         activo: true
+        //(rol queda guardado en empresas/{id}/miembros y en
+        // users/{uid}/empresas/{id}). Un usuario recién creado no tiene
+        // ninguna empresa todavía, así que no tiene sentido un rol global.
+
     });
     return cred;
 };

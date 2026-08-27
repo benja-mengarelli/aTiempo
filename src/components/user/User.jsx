@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { db } from "../../services/firebase";
-import { collection, addDoc, query, updateDoc, doc, Timestamp, where, orderBy, limit, getDocs } from "firebase/firestore";
+import { collection, setDoc, query, updateDoc, doc, Timestamp, where, orderBy, limit, getDocs } from "firebase/firestore";
 import { formatearTiempo, obtenerTiempoActualEnSegundos, contabilizarHoras } from "../../helpers/time.helpers";
 import useGeoLocation from "../../hooks/useGeoLocation";
 import PantallaCarga from "../layout/PantallaCarga";
@@ -12,17 +12,17 @@ const COORDENADAS_CLUB = {
 };
 
 export default function User() {
-    const { user } = useAuth();
+    const { user, empresaActivaId, cargando: cargandoAuth } = useAuth();
     const { flagDistancia, verificarDistancia } = useGeoLocation(COORDENADAS_CLUB);
     const [cargando, setCargando] = useState(false)
     const [tiempo, setTiempo] = useState(0);
-
-    //! Cambiar por objeto en forage
     const [inicioTs, setInicioTs] = useState(
         localStorage.getItem("inicioTs")
             ? Number(localStorage.getItem("inicioTs"))
             : null
     );
+
+    if (cargandoAuth) return <PantallaCarga />;
 
     // Actualizar el tiempo transcurrido cada segundo // Se reinicia al cambiar inicioTs(cambio jornada)
     useEffect(() => {
@@ -37,6 +37,12 @@ export default function User() {
 
     // Iniciar jornada
     const iniciarJornada = async () => {
+
+        if (!empresaActivaId) {
+            alert("No pertenecés a ninguna empresa todavía.");
+            return;
+        }
+
         const ts = Date.now();
         setInicioTs(ts);
         const expiracion = new Date();
@@ -46,24 +52,29 @@ export default function User() {
         // Hacer guardado en fb
         setCargando(true);
         const flag = await verificarDistancia();
-        
+
+        const payload = {
+            fecha: new Date(ts).toLocaleDateString("sv-SE", { timeZone: "America/Argentina/Cordoba" }),
+            diaSemana: new Date(ts).toLocaleDateString("es-AR", { weekday: "long", timeZone: "America/Argentina/Cordoba" }),
+            numeroDia: new Date(ts).getDate(),
+            numeroDiaSemana: new Date(ts).getDay(),
+            inicio: new Date(ts).toLocaleTimeString(),
+            fin: null,
+            duracion: null,
+            mensaje: null,
+            activo: true,
+            expiracion: Timestamp.fromDate(expiracion),
+            uid: user.uid,
+        };
+
         try {
-            const docref = await addDoc(collection(db, "users", user.uid, "jornadas"), {
-                fecha: new Date(ts).toLocaleDateString("sv-SE", { timeZone: "America/Argentina/Cordoba" }),
-                diaSemana: new Date(ts).toLocaleDateString("es-AR", { weekday: "long", timeZone: "America/Argentina/Cordoba" }),
-                numeroDia: new Date(ts).getDate(),
-                numeroDiaSemana: new Date(ts).getDay(),
-                inicio: new Date(ts).toLocaleTimeString(),
-                fin: null,
-                duracion: null,
-                mensaje: null,
-                activo: true,
-                expiracion: Timestamp.fromDate(expiracion)
-            });
+            const nuevoDoc = doc(collection(db, "empresas", empresaActivaId, "jornadas"));
+            await setDoc(nuevoDoc, payload);
+
             localStorage.setItem("inicioTs", ts);
             localStorage.setItem("flagDistancia", flag);
-            localStorage.setItem("jornadaId", docref.id);
-            console.log("Jornada iniciada con ID:", docref.id);
+            localStorage.setItem("jornadaId", nuevoDoc.id);
+            console.log("Jornada iniciada con ID:", nuevoDoc.id);
 
         } catch (e) {
             alert("Error al iniciar la jornada: " + e.message);
@@ -72,7 +83,6 @@ export default function User() {
             localStorage.removeItem("flagDistancia");
             localStorage.removeItem("jornadaId");
             console.log("Error al iniciar jornada:", e);
-
         } finally {
             setCargando(false);
         }
@@ -80,68 +90,64 @@ export default function User() {
 
     // Finalizar jornada
     const finalizarJornada = async () => {
+
+        if (!empresaActivaId) {
+            alert("No pertenecés a ninguna empresa todavía.");
+            return;
+        }
+
         setCargando(true);
 
         const finTs = Date.now();
-        // obtener ubicacion y verificar geolocation
         const flag = await verificarDistancia();
-        // traer contador de ubicacion fuera de rango y sumarle el actual
         let contadorUbicacion = Number(localStorage.getItem("flagDistancia") || 0) + Number(flag || 0);
         const mensaje = contadorUbicacion > 2 ? `Ubicacion no permitida` : contadorUbicacion > 0 ? `Fuera de rango en ${contadorUbicacion} ocasión(es).` : "ubicacion correcta";
 
         // Guardar en Firestore
         try {
-            const jornadaId = localStorage.getItem("jornadaId");
-            console.log("Finalizando jornada con ID:", jornadaId);
-            if (!jornadaId) {
-                const q = query(collection(db, "users", user.uid, "jornadas"), where("activo", "==", true), orderBy("inicio", "desc"), limit(1));
-                const querySnapshot = await getDocs(q);
-                if (querySnapshot.empty) {
-                    //limpiar estado corrupto
-                    setInicioTs(null);
-                    localStorage.removeItem("inicioTs");
-                    localStorage.removeItem("flagDistancia");
-                    localStorage.removeItem("jornadaId");
-                    alert("No se encontró una jornada activa para finalizar. Se ha reseteado el estado. Por favor, intenta iniciar y finalizar la jornada nuevamente.");
-                    throw new Error("No se encontró una jornada activa para finalizar.");
+            let jornadaId = localStorage.getItem("jornadaId");
 
-                }
-                const doc = querySnapshot.docs[0];
-                await updateDoc(doc.ref, {
-                    fin: new Date(finTs).toLocaleTimeString(),
-                    duracion: contabilizarHoras((finTs - inicioTs) / 1000),
-                    mensaje: mensaje,
-                    activo: false
-                });
-            } else {
-                const docRef = doc(db, "users", user.uid, "jornadas", jornadaId);
-                if (!docRef) {
-                    //limpiar estado corrupto
+            if (!jornadaId) {
+
+                const q = query(
+                    collection(db, "empresas", empresaActivaId, "jornadas"),
+                    where("uid", "==", user.uid),
+                    where("activo", "==", true),
+                    orderBy("inicio", "desc"),
+                    limit(1)
+                );
+
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
                     setInicioTs(null);
                     localStorage.removeItem("inicioTs");
                     localStorage.removeItem("flagDistancia");
                     localStorage.removeItem("jornadaId");
-                    alert("No se encontró la jornada para finalizar. Se ha reseteado el estado. Por favor, intenta iniciar y finalizar la jornada nuevamente.");
-                    throw new Error("No se encontró la jornada para finalizar.");
+                    alert("No se encontró una jornada activa para finalizar. Se ha reseteado el estado.");
+                    throw new Error("No se encontró una jornada activa para finalizar.");
                 }
-                await updateDoc(docRef, {
-                    fin: new Date(finTs).toLocaleTimeString(),
-                    duracion: contabilizarHoras((finTs - inicioTs) / 1000),
-                    mensaje: mensaje,
-                    activo: false
-                });
-            }            
-            
-            // Resetear estado
+                jornadaId = querySnapshot.docs[0].id;
+            }
+
+            const payload = {
+                fin: new Date(finTs).toLocaleTimeString(),
+                duracion: contabilizarHoras((finTs - inicioTs) / 1000),
+                mensaje: mensaje,
+                activo: false,
+            };
+
+            await updateDoc(doc(db, "empresas", empresaActivaId, "jornadas", jornadaId), payload);
+
             setInicioTs(null);
             setTiempo(0);
             localStorage.removeItem("inicioTs");
             localStorage.removeItem("flagDistancia");
             localStorage.removeItem("jornadaId");
+
         }
         catch (e) {
             alert("Error al guardar la jornada: " + e.message);
-            //limpiar estado corrupto
             setInicioTs(null);
             setTiempo(0);
             localStorage.removeItem("inicioTs");

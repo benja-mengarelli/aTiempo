@@ -1,25 +1,28 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { Link } from "react-router-dom";
-import PantallaCarga from "../layout/PantallaCarga";
 import { useUsuarios } from "../../hooks/useUsuarios";
-import { Timestamp } from "firebase/firestore";
-import { collection, getDocs, updateDoc } from "firebase/firestore";
-import { db } from "../../services/firebase";
-import {horasFiltradas } from "../../helpers/jornada.helpers";
 import { useDashboardAdmin } from "../../hooks/useDashboardAdmin";
+import { horasFiltradas } from "../../helpers/jornada.helpers";
+import PantallaCarga from "../layout/PantallaCarga";
 import IntensidadDias from "../graficos/IntensidadDias";
 import HorasPorEmpleado from "../graficos/HorasPorEmpleado";
 import TotalHorasEmpleado from "../graficos/TotalHorasEmpleados"
+import EquilibrioCarga from "../graficos/EquilibrioCarga";
 
-
-export function Admin({ datos }) {
-    const { user } = useAuth();
-    const { usuarios, cargando: cargandoUsuarios, eliminarUsuario } = useUsuarios();
-    const { jornadas, cargando: cargandoDashboard, meses, mes, setMes } = useDashboardAdmin(usuarios);
+export function Admin() {
+    const { user, rolActual, empresaActivaId, cargando: cargandoAuth } = useAuth();
+    const { usuarios, cargando: cargandoUsuarios, eliminarUsuario } = useUsuarios(empresaActivaId);
+    const { jornadas, cargando: cargandoDashboard, meses, mes, setMes } = useDashboardAdmin(usuarios, empresaActivaId);
     const filtradas = horasFiltradas(jornadas, mes);
 
-    if (!user || datos?.rol !== "admin") {
+    console.log("Admin.jsx: usuarios", usuarios);
+    console.log("admin.jsx", rolActual, empresaActivaId, cargandoAuth, cargandoUsuarios, cargandoDashboard);
+
+    if (cargandoAuth) return <PantallaCarga />;
+    
+
+
+    if (!user || rolActual !== "admin") {
         alert("No tienes permiso para ver esta página.");
         return <Navigate to="/" replace />;
     }
@@ -29,10 +32,11 @@ export function Admin({ datos }) {
 
     return (
         <div className="Pantalla-admin-principal">
+
             <div className="lista-usuarios">
                 {usuarios
                     .filter(u => u.rol === "usuario")
-                    .filter(u => u.activo !== false)
+                    .filter(u => u.activo !== false) //! Ya no haria falta el filtro
                     .map((u) => (
                         <div key={u.id} className="usuario-card">
                             <Link to={`/admin/${u.id}`} className="usuario-item" >
@@ -61,8 +65,9 @@ export function Admin({ datos }) {
                         </button>
                     ))}
                 </div>
-                <IntensidadDias jornadas={filtradas} />
                 <TotalHorasEmpleado jornadas={filtradas} />
+                <IntensidadDias jornadas={filtradas} />
+                <EquilibrioCarga jornadas={filtradas} />
                 <HorasPorEmpleado jornadas={filtradas} />
             </div>
         </div>

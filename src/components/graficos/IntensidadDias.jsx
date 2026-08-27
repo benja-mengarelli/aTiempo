@@ -33,7 +33,7 @@ export default function IntensidadDias({ jornadas }) {
     }
 
     return (
-        <GraficoCard titulo="⚖️ Intensidad de dias">
+        <GraficoCard titulo="⚖️ Intensidad - Horas / cantidad de empleados">
 
             <ResponsiveContainer width="100%" height={300}>
 
