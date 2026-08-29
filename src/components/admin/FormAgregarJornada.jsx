@@ -30,7 +30,7 @@ const FormAgregarJornada = ({ cerrar, guardar }) => {
         return contabilizarHoras(final - inicial);
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setCargando(true)
         setError("");
@@ -43,7 +43,8 @@ const FormAgregarJornada = ({ cerrar, guardar }) => {
         const duracion = calcularDuracion()
 
         if (duracion === null) {
-            ServerRouter("Inicio debe ser mayor que final")
+            setError("Inicio debe ser mayor que final")
+            setCargando(false); 
             return;
         }
 
@@ -64,12 +65,14 @@ const FormAgregarJornada = ({ cerrar, guardar }) => {
             mensaje: "jornada agregada",
         }
 
-        guardar({payload});
-
-        cerrar();
-        setTimeout(() => {
+        try {
+            await guardar(payload);
+            cerrar();
+        } catch (e) {
+            setError("Error al guardar jornada: " + e.message);
+        } finally {
             setCargando(false);
-        }, 700);
+        }
     }
 
     if (cargando) return <PantallaCarga />

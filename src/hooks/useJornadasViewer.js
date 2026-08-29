@@ -26,13 +26,8 @@ export default function useJornadasViewer({ userId, initialMonth, initialView })
             alert("No tienes permiso de agregar");
             return;
         }
-        try {
-            await agregarJornada(empresaActivaId, userId, jornada);
-            console.log("Jornada agregada");
-        } catch (e) {
-            console.error("Error al agregar", e);
-        }
-        setMostrarForm(false);
+        await agregarJornada(empresaActivaId, userId, jornada);
+        console.log("Jornada agregada");
     };
 
     const eliminarJornada = async (jornadaId) => {
