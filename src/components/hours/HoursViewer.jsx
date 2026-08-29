@@ -36,6 +36,7 @@ export default function HoursViewer({ userId, initialMonth, initialView }) {
     if (loading) return <PantallaCarga />;
 
     return (
+
         <div className="mis-horas">
             <div className="filtros">
                 <div className="visualizacion-fechas">
@@ -116,7 +117,6 @@ export default function HoursViewer({ userId, initialMonth, initialView }) {
                     />
                 )}
             </div>
-
 
             <div className="dashboard-graficos">
                 <CardsResumen jornadas={filtradas} />
