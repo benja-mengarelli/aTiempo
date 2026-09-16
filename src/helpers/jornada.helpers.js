@@ -13,7 +13,7 @@ export function getMesesDisponibles(fechaInicio) {
     // Arrancar desde el primer día del mes actual
     let ahora = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), 1);
 
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 3; i++) {
         if (ahora < inicio) break;
 
         meses.push({

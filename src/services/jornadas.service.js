@@ -1,16 +1,15 @@
-// Jornadas Firestore service
 import { db } from '../services/firebase';
 import { collection, addDoc, deleteDoc, doc } from 'firebase/firestore';
 import { query, orderBy, onSnapshot, getDocs, where } from 'firebase/firestore';
 
 // Get jornadas (with snapshot listener) agrega escucha a cambios en tiempo real
 export function subscribeJornadas(empresaId, userId, onData, onError) {
-  if (!userId || !empresaId) return () => {};
+  if (!userId || !empresaId) return () => { };
 
   const q = query(
     collection(db, 'empresas', empresaId, 'jornadas'),
     where('uid', '==', userId),
-    orderBy('fecha', 'desc')    
+    orderBy('fecha', 'desc')
   );
   const unsubscribe = onSnapshot(
     q,
@@ -34,12 +33,12 @@ export async function getJornadas(empresaId, userId) {
     where('expiracion', '>', hoy),
     orderBy('fecha', 'desc')
   );
-  
+
   const snap = await getDocs(q);
   return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 }
 
-export async function agregarJornada(empresaId, userId, jornada) {
+export async function agregarJornada(empresaId, jornada) {
   const ref = collection(db, 'empresas', empresaId, 'jornadas');
   return addDoc(ref, jornada);
 }
@@ -49,3 +48,17 @@ export async function eliminarJornada(empresaId, jornadaId) {
   return deleteDoc(ref);
 }
 
+export async function getJornadasRecientes(empresaId, userId, dias = 5) {
+  const limiteDate = new Date();
+  limiteDate.setDate(limiteDate.getDate() - dias);
+  const fechaLimite = limiteDate.toLocaleDateString('sv-SE', { timeZone: 'America/Argentina/Cordoba' });
+
+  const q = query(
+    collection(db, 'empresas', empresaId, 'jornadas'),
+    where('uid', '==', userId),
+    where('fecha', '>=', fechaLimite),
+    orderBy('fecha', 'desc')
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+}
