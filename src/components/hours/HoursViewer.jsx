@@ -6,10 +6,8 @@ import HorasPor15Dias from './HorasPor15Dias';
 import HorasPorSemana from './HorasPorSemana';
 import FormAgregarJornada from '../admin/FormAgregarJornada';
 import PantallaCarga from '../layout/PantallaCarga';
-import HorasPorDiaSemana from "../graficos/HorasPorDiaSemana";
-import CardsResumen from "../graficos/CardsResumen";
-import EvolucionMensual from "../graficos/EvolucionMensual";
-import JornadasPorDiaSemana from "../graficos/JornadasPorDia";
+import CardsResumen from '../graficos/CardsResumen';
+
 
 export default function HoursViewer({ userId, initialMonth, initialView }) {
     const {
@@ -21,6 +19,7 @@ export default function HoursViewer({ userId, initialMonth, initialView }) {
         mostrarForm,
         setMostrarForm,
         loading,
+        error,
         datos,
         rolActual,
         filtradas,
@@ -34,6 +33,16 @@ export default function HoursViewer({ userId, initialMonth, initialView }) {
     } = useJornadasViewer({ userId, initialMonth, initialView });
 
     if (loading) return <PantallaCarga />;
+
+    if (error) {
+        return (
+            <div className="mis-horas">
+                <p style={{ color: "red" }}>
+                    Ocurrió un error al cargar las jornadas: {error.message || String(error)}
+                </p>
+            </div>
+        );
+    }
 
     return (
 
@@ -120,9 +129,6 @@ export default function HoursViewer({ userId, initialMonth, initialView }) {
 
             <div className="dashboard-graficos">
                 <CardsResumen jornadas={filtradas} />
-                <EvolucionMensual jornadas={filtradas} />
-                <HorasPorDiaSemana jornadas={filtradas} />
-                <JornadasPorDiaSemana jornadas={filtradas} />
             </div>
 
             {mostrarForm && (

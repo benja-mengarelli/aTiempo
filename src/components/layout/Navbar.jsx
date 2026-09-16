@@ -25,12 +25,15 @@ export function Navbar({ user, onlogout }) {
     return (
         <div className="caja-navbar">
             <nav className="navbar">
-                <Link to="/"><img src={user?.imagen} alt={user?.nombre} /></Link>
+                <Link to="/"><span>{user?.nombre[0]}</span></Link>
+                {user?.rol === "admin" && (
+                    <Link to={"/admin/configuracion"} className="btn-mis-horas">⚙️</Link>
+                )}
 
                 {user?.rol === "usuario" && (
-                    <Link to={`/user/${user.uid}`} className="btn-mis-horas">Mis Horas</Link>
+                    <Link to={`/user/${user.uid}`} className="btn-mis-horas">📆</Link>
                 )}
-                {/* <button> <Link to={`/juego`} >🕹️</Link> </button> */}
+                {/* <bu|tton> <Link to={`/juego`} >🕹️</Link> </bu|tton> */}
                 <button onClick={handleThemeToggle} aria-label="Cambiar tema">
                     {darkMode ? "🌙" : "☀️"}
                 </button>

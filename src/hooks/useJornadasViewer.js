@@ -12,7 +12,7 @@ export default function useJornadasViewer({ userId, initialMonth, initialView })
     const meses = getMesesDisponibles(FECHA_INICIO);
     const [mes, setMes] = useState(initialMonth || (meses[0] && meses[0].value) || '');
 
-    const { jornadas, loading } = useJornadas(empresaActivaId, userId);
+    const { jornadas, loading, error } = useJornadas(empresaActivaId, userId);
 
     const [tipoVisualizacion, setTipoVisualizacion] = useState(initialView || 'mes');
     const [mostrarForm, setMostrarForm] = useState(false);
@@ -23,10 +23,9 @@ export default function useJornadasViewer({ userId, initialMonth, initialView })
     const guardarJornada = async (jornada) => {
         // rolActual ya es null si no hay empresa activa, no hace falta chequear !datos aparte
         if (rolActual !== "admin") {
-            alert("No tienes permiso de agregar");
-            return;
+            throw new Error("No tienes permiso para agregar jornadas");
         }
-        await agregarJornada(empresaActivaId, userId, jornada);
+        await agregarJornada(empresaActivaId, { ...jornada, uid: userId });
         console.log("Jornada agregada");
     };
 
@@ -59,6 +58,7 @@ export default function useJornadasViewer({ userId, initialMonth, initialView })
         mostrarForm,
         setMostrarForm,
         loading,
+        error,
         datos,
         rolActual,
         filtradas,

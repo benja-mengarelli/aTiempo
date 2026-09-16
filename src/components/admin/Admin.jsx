@@ -1,38 +1,57 @@
 import { Navigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useUsuarios } from "../../hooks/useUsuarios";
-import { useDashboardAdmin } from "../../hooks/useDashboardAdmin";
-import { horasFiltradas } from "../../helpers/jornada.helpers";
+import { usePeticionesAdmin } from "./UsePeticionesAdmin";
 import PantallaCarga from "../layout/PantallaCarga";
-import IntensidadDias from "../graficos/IntensidadDias";
-import HorasPorEmpleado from "../graficos/HorasPorEmpleado";
-import TotalHorasEmpleado from "../graficos/TotalHorasEmpleados"
-import EquilibrioCarga from "../graficos/EquilibrioCarga";
+import { useState } from "react";
+import PantallaPeticiones from "./PantallaPeticiones";
+import { bulk_aprobarPeticiones, bulk_eliminarPeticiones } from "../../services/peticiones.service";
+
+
+import {
+    collection,
+    getDocs,
+    doc,
+    setDoc,
+    writeBatch
+} from "firebase/firestore";
+import { db } from "../../services/firebase";
+
+
+
+
 
 export function Admin() {
     const { user, rolActual, empresaActivaId, cargando: cargandoAuth } = useAuth();
     const { usuarios, cargando: cargandoUsuarios, eliminarUsuario } = useUsuarios(empresaActivaId);
-    const { jornadas, cargando: cargandoDashboard, meses, mes, setMes } = useDashboardAdmin(usuarios, empresaActivaId);
-    const filtradas = horasFiltradas(jornadas, mes);
-
-    console.log("Admin.jsx: usuarios", usuarios);
-    console.log("admin.jsx", rolActual, empresaActivaId, cargandoAuth, cargandoUsuarios, cargandoDashboard);
+    const { peticiones, total: totalPeticiones } = usePeticionesAdmin(empresaActivaId);
+    const [mostrarPeticiones, setMostrarPeticiones] = useState(false);
 
     if (cargandoAuth) return <PantallaCarga />;
-    
-
 
     if (!user || rolActual !== "admin") {
         alert("No tienes permiso para ver esta página.");
         return <Navigate to="/" replace />;
     }
 
-    if (cargandoUsuarios || cargandoDashboard) return <PantallaCarga />;
-
+    if (cargandoUsuarios) return <PantallaCarga />;
 
     return (
         <div className="Pantalla-admin-principal">
 
+            <button onClick={() => setMostrarPeticiones(true)} className="boton-peticiones">
+                Peticiones<span className="badge">{totalPeticiones}</span>
+            </button>
+            {mostrarPeticiones && (
+                <PantallaPeticiones
+                    peticiones={peticiones}
+                    cerrar={() => setMostrarPeticiones(false)}
+                    onAceptar={(peticion) => bulk_aprobarPeticiones(empresaActivaId, [peticion])}
+                    onEliminar={(peticionId) => bulk_eliminarPeticiones(empresaActivaId, [peticionId])}
+                    onAceptarTodas={(todas) => bulk_aprobarPeticiones(empresaActivaId, todas)}
+                    onEliminarTodas={(todas) => bulk_eliminarPeticiones(empresaActivaId, todas.map(p => p.id))}
+                />
+            )}
             <div className="lista-usuarios">
                 {usuarios
                     .filter(u => u.rol === "usuario")
@@ -48,27 +67,6 @@ export function Admin() {
                             <button className="eliminar-usuario" onClick={() => eliminarUsuario(u.id)}>⛔</button>
                         </div>
                     ))}
-            </div>
-            <div className="dashboard-graficos-admin">
-                <div className="visualizacion-fechas">
-                    {meses.map(m => (
-                        <button
-                            key={m.value}
-                            onClick={() => setMes(m.value)}
-                            style={{
-                                backgroundColor: mes === m.value ? "var(--primario)" : "#ddd",
-                                color: mes === m.value ? "white" : "black",
-                                transform: mes === m.value ? "scale(1.1)" : "none",
-                            }}
-                        >
-                            {m.label}
-                        </button>
-                    ))}
-                </div>
-                <TotalHorasEmpleado jornadas={filtradas} />
-                <IntensidadDias jornadas={filtradas} />
-                <EquilibrioCarga jornadas={filtradas} />
-                <HorasPorEmpleado jornadas={filtradas} />
             </div>
         </div>
     );
