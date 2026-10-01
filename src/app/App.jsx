@@ -15,7 +15,12 @@ import { useRegisterSW } from 'virtual:pwa-register/react';
 import { JornadaActivaProvider } from '../context/jornadaContext';
 export default function App() {
 
-  const {user, datos, rolActual, cargando, logout} = useAuth();
+  const {user, datos, rolActual, cargando, cargandoConfiguracion, ConfiguracionEmpresa, logout} = useAuth();
+
+  console.log("user", user, datos, rolActual, cargando)
+  console.log("cargando:", cargandoConfiguracion)
+  console.log(ConfiguracionEmpresa)
+
 
   // verificar V nueva
   const { needRefresh, updateServiceWorker } = useRegisterSW();
@@ -26,7 +31,7 @@ export default function App() {
     }
   }, [needRefresh, updateServiceWorker]);
 
-  if (cargando) return <PantallaCarga />;
+  if (cargando || cargandoConfiguracion) return <PantallaCarga />;
   if (!user) return <LoginPopUp />;
 
   return (

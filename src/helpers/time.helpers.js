@@ -15,23 +15,41 @@ export const formatearTiempo = (segundos) => {
 };
 
 //Contabilizar horas / redondeado a horas
-export const contabilizarHoras = (segundos) => {
-    // Always work with positive seconds
+export const contabilizarHoras = (segundos, redondeo, minimo) => {
+    // abs para positivo // mins para calculo redondeo
     segundos = Math.abs(segundos);
     let hrs = Math.floor(segundos / 3600);
     let mins = Math.floor((segundos % 3600) / 60);
-    // Redondeo por cuartos de hora
-    if (mins > 45) {
-        hrs += 1;
-        mins = 0;
-    } else if (mins > 30) {
-        hrs += 0.75;
-    } else if (mins > 15) {
-        hrs += 0.5;
-    } else if (mins > 0) {
-        hrs += 0.25;
+
+
+    // redondeo en base a 0 / 15 /30 mins. 
+    // DEVUELVE HORAS EN FORMATO FLOTANTE
+    if (redondeo == 0) {
+        hrs += mins / 100;
     }
-    return hrs < 2.5 ? 2.5 : hrs;
+
+    if (redondeo == 15) {
+        if (mins > 45) {
+            hrs += 1;
+        } else if (mins > 30) {
+            hrs += 0.75;
+        } else if (mins > 15) {
+            hrs += 0.5;
+        } else if (mins > 0) {
+            hrs += 0.25;
+        }
+    }
+
+    if (redondeo == 30) {
+        if (mins > 30) {
+            hrs += 1
+        } else if (mins > 0) {
+            hrs += 0.5
+        }
+    }
+
+    // Redondeo por cuartos de hora
+    return hrs < minimo ? minimo : hrs;
 };
 
 // OBTENER TIEMPO ACTUAL EN SEGUNDOS Respecto al inicio

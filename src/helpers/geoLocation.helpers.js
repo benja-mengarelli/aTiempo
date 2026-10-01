@@ -16,7 +16,6 @@ export const distanciaEntreCoordenadas = (lat1, lon1, lat2, lon2) => {
 
 // OBTENER UBICACION ACTUAL CON PROMESA
 export function obtenerUbicacion(options = {enableHighAccuracy: true}) {
-    console.log("Obteniendo ubicación...");
     return new Promise((resolve, reject) => {
         if (!navigator.geolocation) {
             reject(new Error("Geolocalización no soportada"));

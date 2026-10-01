@@ -16,16 +16,19 @@ import { useAuth } from "./AuthContext";
 import useGeoLocation from "../hooks/useGeoLocation";
 import { contabilizarHoras } from "../helpers/time.helpers";
 
-const COORDENADAS_CLUB = {
+/* const COORDENADAS_CLUB = {
     latitud: -31.369203,
     longitud: -64.240521
-};
+}; */
 
 const JornadaActivaContext = createContext();
 
 export const JornadaActivaProvider = ({ children }) => {
-    const { user, empresaActivaId } = useAuth();
-    const { verificarDistancia } = useGeoLocation(COORDENADAS_CLUB);
+    const { user, empresaActivaId, configuracionEmpresa } = useAuth();
+    console.log("desde context: ", user, empresaActivaId, configuracionEmpresa)
+
+
+    /* const { verificarDistancia } = useGeoLocation(COORDENADAS, distanciaMax); */
 
     const [jornadaActiva, setJornadaActiva] = useState(null);
     const [cargando, setCargando] = useState(true);
@@ -75,9 +78,15 @@ export const JornadaActivaProvider = ({ children }) => {
             return;
         }
 
+        const COORDENADAS = {
+            latitud: configuracionEmpresa.latitud,
+            longitud: configuracionEmpresa.longitud
+        }
+        const distanciaMax = configuracionEmpresa.rangoMetros
+
         setProcesando(true);
         try {
-            const flagInicio = await verificarDistancia();
+            const flagInicio = await useGeoLocation(COORDENADAS, distanciaMax);
             const ts = Date.now();
             const expiracion = new Date();
             expiracion.setMonth(expiracion.getMonth() + 6);
@@ -123,15 +132,27 @@ export const JornadaActivaProvider = ({ children }) => {
 
         setProcesando(true);
         try {
+
+            // Preparamos las props para el calculo de la duracion y 
+            //el uso de la geolocalizacion
+            const COORDENADAS = {
+                latitud: configuracionEmpresa.latitud,
+                longitud: configuracionEmpresa.longitud
+            }
+            const distanciaMax = configuracionEmpresa.rangoMetros;
+            const redondeo = configuracionEmpresa.reondeoMinutos;
+            const minimo = configuracionEmpresa.minimoHS;
+            const segundos = (finTs - inicioReal) / 1000;
+
             const finTs = Date.now();
-            const flagFin = await verificarDistancia();
+            const flagFin = await useGeoLocation(COORDENADAS, distanciaMax);
             const contadorUbicacion = Number(jornadaActiva.flagDistanciaInicio || 0) + Number(flagFin || 0);
             const mensaje =
                 contadorUbicacion > 2
                     ? "Ubicacion no permitida"
                     : contadorUbicacion > 0
                         ? `Fuera de rango en ${contadorUbicacion} ocasión(es).`
-                        : "ubicacion correcta";
+                        : "Ubicacion correcta";
 
             // inicioTimestamp viene del propio doc: funciona sin importar
             // desde qué dispositivo se inició la jornada.
@@ -141,7 +162,7 @@ export const JornadaActivaProvider = ({ children }) => {
 
             const cambios = {
                 fin: new Date(finTs).toLocaleTimeString(),
-                duracion: contabilizarHoras((finTs - inicioReal) / 1000),
+                duracion: contabilizarHoras(segundos, redondeo, minimo),
                 mensaje,
                 activo: false,
             };

@@ -16,14 +16,14 @@ export default function User() {
         iniciarJornada,
         finalizarJornada,
     } = useJornadaActiva();
-    const { user, datos, empresaActivaId } = useAuth();
+    const { user, datos, empresaActivaId, cargandoConfiguracion} = useAuth();
 
 
     const [mostrarFormSolicitar, setMostrarFormSolicitar] = useState(false);
     const [mostrarFormEditar, setMostrarFormEditar] = useState(false);
     const [mostrarFormEliminar, setMostrarFormEliminar] = useState(false);
     const [tiempo, setTiempo] = useState(0);
-    const { peticiones, contarPorTipo } = usePeticionesUsuario(empresaActivaId, user?.uid);
+    const { contarPorTipo } = usePeticionesUsuario(empresaActivaId, user?.uid);
 
 
     const solicitarJornada = ({ fecha, payload, mensaje }) => {
@@ -53,7 +53,7 @@ export default function User() {
         return () => clearInterval(intervalo);
     }, [inicioTs]);
 
-    if (cargando || procesando) return <PantallaCarga />;
+    if (cargando || procesando || cargandoConfiguracion) return <PantallaCarga />;
 
     return (
         <div className="manejo-jornada" >

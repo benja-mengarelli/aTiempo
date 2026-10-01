@@ -3,7 +3,7 @@ import { useAuth } from "../../context/AuthContext";
 import PantallaCarga from "../layout/PantallaCarga";
 import MapaSeleccionCoordenadas from "../layout/MapaSeleccionCoordenedas";
 
-const OPCIONES_REDONDEO = [0, 5, 10, 15, 30];
+const OPCIONES_REDONDEO = [0, 15, 30];
 const CENTRO_CORDOBA = { latitud: -31.4201, longitud: -64.1888 };
 
 export default function Configuracion() {
@@ -18,10 +18,11 @@ export default function Configuracion() {
 
     const esAdmin = rolActual === "admin";
 
-    const [latitud, setLatitud] = useState(configuracionEmpresa?.coordenadas?.latitud ?? CENTRO_CORDOBA.latitud);
-    const [longitud, setLongitud] = useState(configuracionEmpresa?.coordenadas?.longitud ?? CENTRO_CORDOBA.longitud);
+    const [latitud, setLatitud] = useState(CENTRO_CORDOBA.latitud);
+    const [longitud, setLongitud] = useState(CENTRO_CORDOBA.longitud);
     const [rangoMetros, setRangoMetros] = useState(100);
     const [redondeoMinutos, setRedondeoMinutos] = useState(15);
+    const [minimoHS, setMinimoHS] = useState(0)
     const [guardando, setGuardando] = useState(false);
     const [error, setError] = useState("");
     const [exito, setExito] = useState(false);
@@ -33,6 +34,8 @@ export default function Configuracion() {
         setLatitud(configuracionEmpresa.coordenadas?.latitud ?? CENTRO_CORDOBA.latitud);
         setLongitud(configuracionEmpresa.coordenadas?.longitud ?? CENTRO_CORDOBA.longitud);
         setRedondeoMinutos(configuracionEmpresa.redondeoMinutos ?? 15);
+        setRangoMetros(configuracionEmpresa.rangoMetros ?? 100)
+        setMinimoHS(configuracionEmpresa.minimoHS ?? 0)
     }, [configuracionEmpresa]);
 
     // si solo chequeáramos cargandoConfiguracion, esta pantalla
@@ -64,6 +67,7 @@ export default function Configuracion() {
                 coordenadas: { latitud: lat, longitud: lng },
                 rangoMetros: Number(rangoMetros),
                 redondeoMinutos: Number(redondeoMinutos),
+                minimoHS: Number(minimoHS)
             });
             setExito(true);
         } catch (err) {
@@ -114,6 +118,18 @@ export default function Configuracion() {
                             <option key={min} value={min}>{min} minutos</option>
                         ))}
                     </select>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Minimo de horas por jornada (Min: 0hs - Max: 8hs )</legend>
+                    <input
+                        type="number"
+                        value={minimoHS}
+                        onChange={(e) => setMinimoHS(Number(e.target.value))}
+                        min={0}
+                        max={8}
+                        step={0.5}
+                    />
                 </fieldset>
 
                 {error && <p style={{ color: "red" }}>{error}</p>}
