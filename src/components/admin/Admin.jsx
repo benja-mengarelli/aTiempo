@@ -7,21 +7,7 @@ import { useState } from "react";
 import PantallaPeticiones from "./PantallaPeticiones";
 import { bulk_aprobarPeticiones, bulk_eliminarPeticiones } from "../../services/peticiones.service";
 
-
-import {
-    collection,
-    getDocs,
-    doc,
-    setDoc,
-    writeBatch
-} from "firebase/firestore";
-import { db } from "../../services/firebase";
-
-
-
-
-
-export function Admin() {
+export default function Admin() {
     const { user, rolActual, empresaActivaId, cargando: cargandoAuth } = useAuth();
     const { usuarios, cargando: cargandoUsuarios, eliminarUsuario } = useUsuarios(empresaActivaId);
     const { peticiones, total: totalPeticiones } = usePeticionesAdmin(empresaActivaId);

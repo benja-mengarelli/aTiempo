@@ -7,6 +7,8 @@ import FormEditarJornada from "./FormEditarJornada";
 import FormEliminarJornada from "./FormEliminarJornada";
 import { crearPeticion } from "../../services/peticiones.service"
 import { usePeticionesUsuario } from "./UsePeticionesUser";
+import { useConfiguracionEmpresa } from "../../hooks/useConfiguracionEmpresa";
+import { obtenerTiempoActualEnSegundos } from "../../helpers/time.helpers";
 
 export default function User() {
     const {
@@ -16,7 +18,8 @@ export default function User() {
         iniciarJornada,
         finalizarJornada,
     } = useJornadaActiva();
-    const { user, datos, empresaActivaId, cargandoConfiguracion} = useAuth();
+    const { user, datos, empresaActivaId} = useAuth();
+    const { cargandoConfiguracion} = useConfiguracionEmpresa(empresaActivaId);
 
 
     const [mostrarFormSolicitar, setMostrarFormSolicitar] = useState(false);
@@ -64,7 +67,7 @@ export default function User() {
 
                 <button
                     onClick={jornadaActiva ? finalizarJornada : iniciarJornada}
-                    disabled={cargando || procesando}
+                    disabled={cargando || procesando || cargandoConfiguracion}
                 >
                     {jornadaActiva ? "⏸️Finalizar" : "▶️Iniciar"}
                 </button>

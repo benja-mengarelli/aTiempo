@@ -15,20 +15,16 @@ import { db } from "../services/firebase";
 import { useAuth } from "./AuthContext";
 import useGeoLocation from "../hooks/useGeoLocation";
 import { contabilizarHoras } from "../helpers/time.helpers";
-
-/* const COORDENADAS_CLUB = {
-    latitud: -31.369203,
-    longitud: -64.240521
-}; */
+import { useConfiguracionEmpresa } from "../hooks/useConfiguracionEmpresa";
 
 const JornadaActivaContext = createContext();
 
 export const JornadaActivaProvider = ({ children }) => {
-    const { user, empresaActivaId, configuracionEmpresa } = useAuth();
-    console.log("desde context: ", user, empresaActivaId, configuracionEmpresa)
+    const { user, empresaActivaId} = useAuth();
+    const { configuracion } = useConfiguracionEmpresa(empresaActivaId);
 
-
-    /* const { verificarDistancia } = useGeoLocation(COORDENADAS, distanciaMax); */
+    console.log("empresaActivaId en JornadaActivaProvider:", empresaActivaId);
+    console.log("configuracion en JornadaActivaProvider:", configuracion);
 
     const [jornadaActiva, setJornadaActiva] = useState(null);
     const [cargando, setCargando] = useState(true);
@@ -79,10 +75,10 @@ export const JornadaActivaProvider = ({ children }) => {
         }
 
         const COORDENADAS = {
-            latitud: configuracionEmpresa.latitud,
-            longitud: configuracionEmpresa.longitud
+            latitud: configuracion.latitud,
+            longitud: configuracion.longitud
         }
-        const distanciaMax = configuracionEmpresa.rangoMetros
+        const distanciaMax = configuracion.rangoMetros
 
         setProcesando(true);
         try {
@@ -136,12 +132,12 @@ export const JornadaActivaProvider = ({ children }) => {
             // Preparamos las props para el calculo de la duracion y 
             //el uso de la geolocalizacion
             const COORDENADAS = {
-                latitud: configuracionEmpresa.latitud,
-                longitud: configuracionEmpresa.longitud
+                latitud: configuracion.latitud,
+                longitud: configuracion.longitud
             }
-            const distanciaMax = configuracionEmpresa.rangoMetros;
-            const redondeo = configuracionEmpresa.reondeoMinutos;
-            const minimo = configuracionEmpresa.minimoHS;
+            const distanciaMax = configuracion.rangoMetros;
+            const redondeo = configuracion.reondeoMinutos;
+            const minimo = configuracion.minimoHS;
             const segundos = (finTs - inicioReal) / 1000;
 
             const finTs = Date.now();

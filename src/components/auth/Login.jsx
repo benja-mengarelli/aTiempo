@@ -1,15 +1,21 @@
 import { useState } from "react";
 import { login, register } from "../../services/auth.service";
+import { useNavigate } from "react-router-dom";
 
 
 
 export default function LoginPopUp() {
     const [modoRegistro, setModoRegistro] = useState(false);
+    const navigate = useNavigate();
     const [nombre, setNombre] = useState("");
     const [email, setEmail] = useState("");
     const [pass, setPass] = useState("");
     const [error, setError] = useState(null);
     const [imagen, setImagen] = useState("/img/usuario.png")
+
+    const redirectToLanding = () => {
+        navigate("/");
+    }
 
     const options = [
     { id: "b", src: "/img/usuario.png", label: "Opción B" },
@@ -22,6 +28,7 @@ export default function LoginPopUp() {
     const hacerLogin = async () => {
         try {
             await login(email, pass);
+            redirectToLanding();
         } catch (e) {
             setError(e.message);
             alert("Error al iniciar sesión: " + e.message);
@@ -31,6 +38,7 @@ export default function LoginPopUp() {
     const hacerRegistro = async () => {
         try {
             await register(nombre, email, pass, imagen);
+            redirectToLanding();
         } catch (e) {
             setError(e.message);
             alert("Error al registrar usuario: " + e.message);
@@ -46,7 +54,7 @@ export default function LoginPopUp() {
     return (
         <div className="modal-fondo">
             <div className="modal-caja">
-                <h2>{modoRegistro ? "Registrarse" : "Iniciar Sesión"}</h2>
+                <h2>{modoRegistro ? "Registrarse" : "Iniciar Sesión"} <button onClick={redirectToLanding}>X</button></h2>
 
                 <form onSubmit={handleSubmit}>
                     {modoRegistro && (

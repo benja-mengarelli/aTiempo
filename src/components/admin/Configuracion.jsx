@@ -2,24 +2,19 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import PantallaCarga from "../layout/PantallaCarga";
 import MapaSeleccionCoordenadas from "../layout/MapaSeleccionCoordenedas";
+import { useConfiguracionEmpresa } from "../../hooks/useConfiguracionEmpresa";
 
 const OPCIONES_REDONDEO = [0, 15, 30];
 const CENTRO_CORDOBA = { latitud: -31.4201, longitud: -64.1888 };
 
 export default function Configuracion() {
-    const {
-        rolActual,
-        empresaActivaId,
-        configuracionEmpresa,
-        cargandoConfiguracion,
-        cargando: cargandoAuth,
-        actualizarConfiguracionEmpresa,
-    } = useAuth();
+    const { rolActual, empresaActivaId, cargando: cargandoAuth } = useAuth();
+    const { configuracion, cargandoConfiguracion, actualizarConfiguracionEmpresa } = useConfiguracionEmpresa(empresaActivaId);
 
     const esAdmin = rolActual === "admin";
 
-    const [latitud, setLatitud] = useState(CENTRO_CORDOBA.latitud);
-    const [longitud, setLongitud] = useState(CENTRO_CORDOBA.longitud);
+    const [latitud, setLatitud] = useState(null);
+    const [longitud, setLongitud] = useState(null);
     const [rangoMetros, setRangoMetros] = useState(100);
     const [redondeoMinutos, setRedondeoMinutos] = useState(15);
     const [minimoHS, setMinimoHS] = useState(0)
@@ -30,20 +25,19 @@ export default function Configuracion() {
     // Sincronizamos el form con lo que llega de Firestore (al entrar, o si
     // otro admin lo actualiza mientras esta pantalla sigue abierta).
     useEffect(() => {
-        if (!configuracionEmpresa) return;
-        setLatitud(configuracionEmpresa.coordenadas?.latitud ?? CENTRO_CORDOBA.latitud);
-        setLongitud(configuracionEmpresa.coordenadas?.longitud ?? CENTRO_CORDOBA.longitud);
-        setRedondeoMinutos(configuracionEmpresa.redondeoMinutos ?? 15);
-        setRangoMetros(configuracionEmpresa.rangoMetros ?? 100)
-        setMinimoHS(configuracionEmpresa.minimoHS ?? 0)
-    }, [configuracionEmpresa]);
+        if (!configuracion) return;
+        setLatitud(configuracion.coordenadas?.latitud ?? CENTRO_CORDOBA.latitud);
+        setLongitud(configuracion.coordenadas?.longitud ?? CENTRO_CORDOBA.longitud);
+        setRedondeoMinutos(configuracion.redondeoMinutos ?? 15);
+        setRangoMetros(configuracion.rangoMetros ?? 100)
+        setMinimoHS(configuracion.minimoHS ?? 0)
+    }, [configuracion]);
 
-    // si solo chequeáramos cargandoConfiguracion, esta pantalla
-    // podría montarse ANTES de que empresaActivaId esté resuelto (ese efecto
-    // ni arrancó todavía) y mostraría "no configurada" en falso. Por eso
-    // esperamos también el cargando principal del auth.
     if (cargandoAuth || cargandoConfiguracion) return <PantallaCarga />;
 
+
+    //! cambiar por render condicional: 
+    // Si no hay empresa activa, elegir una
     if (!empresaActivaId) {
         return <p>No pertenecés a ninguna empresa todavía.</p>;
     }
@@ -82,7 +76,7 @@ export default function Configuracion() {
     return (
         <div className="configuracion-empresa">
             <form onSubmit={handleGuardar}>
-                <h2>Configuración de la empresa {configuracionEmpresa?.nombre || ""}</h2>
+                <h2>Configuración de la empresa {configuracion?.nombre || ""}</h2>
                 <fieldset>
                     <legend>Coordenadas (para validar ubicación al fichar) </legend>
                     <label>

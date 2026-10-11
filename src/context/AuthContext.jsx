@@ -11,8 +11,6 @@ export const AuthProvider = ({ children }) => {
     // Cada item: { id, rol, nombre, activo, ... } -- viene de users/{uid}/empresas
     const [empresas, setEmpresas] = useState([]);
     const [empresaActivaId, setEmpresaActivaId] = useState(null);
-    const [configuracionEmpresa, setConfiguracionEmpresa] = useState(null);
-    const [cargandoConfiguracion, setCargandoConfiguracion] = useState(false);
     const [cargando, setCargando] = useState(true);
 
     useEffect(() => {
@@ -22,12 +20,16 @@ export const AuthProvider = ({ children }) => {
                     setUser(user);
                     setCargando(true);
 
-                    const docRef = doc(db, "users", user.uid);
-                    const docSnap = await getDoc(docRef);
+                    //Lecturas en paralelo para establecer el user y su/s empresa/s
+                    const [docSnap, empresasSnap] = await Promise.all([
+                        getDoc(doc(db, "users", user.uid)),
+                        getDocs(collection(db, "users", user.uid, "empresas")),
+                    ]);
+
+                    // Datos del usuario (nombre, uid, etc)
                     setDatos(docSnap.exists() ? docSnap.data() : null);
 
                     // A qué empresas pertenece
-                    const empresasSnap = await getDocs(collection(db, "users", user.uid, "empresas"));
                     const listaEmpresas = empresasSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
                     setEmpresas(listaEmpresas);
 
@@ -63,68 +65,36 @@ export const AuthProvider = ({ children }) => {
         return () => unsub();
     }, []);
 
-    // Config de la empresa (coordenadas, redondeo, etc): efecto SEPARADO del
-    // principal, con su propio loading, para no bloquear el resto de la app
-    // esperando algo que la mayoría de las pantallas ni necesita.
-    useEffect(() => {
-        if (!empresaActivaId) {
-            setConfiguracionEmpresa(null);
-            return;
-        }
-
-        let cancelado = false;
-        setCargandoConfiguracion(true);
-
-        getDoc(doc(db, "empresas", empresaActivaId))
-            .then((snap) => {
-                if (cancelado) return;
-                setConfiguracionEmpresa(snap.exists() ? snap.data() : null);
-            })
-            .catch((e) => {
-                console.error("Error al cargar configuración de la empresa:", e);
-                if (!cancelado) setConfiguracionEmpresa(null);
-            })
-            .finally(() => {
-                if (!cancelado) setCargandoConfiguracion(false);
-            });
-
-        return () => { cancelado = true; };
-    }, [empresaActivaId]);
-
-    // Solo debería llamarla un admin - las reglas ya lo exigen del lado del
-    // servidor (allow update en empresas/{id}), esto es solo el atajo del cliente.
-    const actualizarConfiguracionEmpresa = async (cambios) => {
-        if (!empresaActivaId) throw new Error("No hay empresa activa.");
-        await updateDoc(doc(db, "empresas", empresaActivaId), cambios);
-        setConfiguracionEmpresa((prev) => ({ ...prev, ...cambios }));
+    // Solo marca "dónde está parado el usuario". Sin persistencia: si recarga la
+    // página, la ruta (/empresa/:empresaId/...) es la que lo vuelve a setear.
+    const cambiarEmpresaActiva = (empresaId) => {
+        if (!empresas.some((e) => e.id === empresaId)) return; // solo empresas a las que pertenece
+        setEmpresaActivaId(empresaId);
     };
 
-    const cambiarEmpresaActiva = (empresaId) => {
-        if (user) localStorage.setItem(`empresaActiva:${user.uid}`, empresaId);
-        setEmpresaActivaId(empresaId);
+    const salirDeEmpresa = () => setEmpresaActivaId(null);
+
+    // `empresas` se carga una sola vez al loguearse: después de canjear un
+    // código hay que volver a pedirla, si no la empresa nueva no aparece.
+    const refrescarEmpresas = async () => {
+        if (!user) return [];
+        const snap = await getDocs(collection(db, "users", user.uid, "empresas"));
+        const lista = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        setEmpresas(lista);
+        return lista;
     };
 
     const empresaActiva = empresas.find((e) => e.id === empresaActivaId) || null;
     const rolActual = empresaActiva?.rol || null;
 
     const logout = async () => {
-        // Reseteamos el estado ANTES de invalidar la sesión, para que los
-        // componentes que dependen de empresaActivaId empiecen a desmontarse
-        // lo antes posible (acorta, no elimina del todo, la ventana donde un
-        // fetch en curso puede llegar a chocar con la sesión ya invalidada).
+        // Reseteamos el estado ANTES de invalidar la sesión
         setUser(null);
         setDatos(null);
         setEmpresas([]);
         setEmpresaActivaId(null);
-        setConfiguracionEmpresa(null);
         await signOut(auth);
     };
-
-    // Ejemplo de uso en el router/pantalla principal:
-    //   cargando                              -> loading/skeleton
-    //   !cargando && empresas.length === 0     -> pantalla "ingresar código"
-    //   !cargando && empresaActivaId === null  -> pantalla "elegí tu empresa" (solo pasa con 2+)
-    //   !cargando && empresaActivaId !== null  -> app normal, Navbar según rolActual
 
     return (
         <AuthContext.Provider
@@ -134,13 +104,12 @@ export const AuthProvider = ({ children }) => {
                 empresas,
                 empresaActivaId,
                 empresaActiva,
-                configuracionEmpresa,
-                cargandoConfiguracion,
-                actualizarConfiguracionEmpresa,
                 rolActual,
                 cambiarEmpresaActiva,
                 cargando,
                 logout,
+                salirDeEmpresa,
+                refrescarEmpresas,
             }}
         >
             {children}

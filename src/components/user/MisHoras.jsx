@@ -5,9 +5,9 @@ import PantallaCarga from "../layout/PantallaCarga";
 
 export default function MisHoras() {
     const { id } = useParams();
-    const { user, cargando } = useAuth();
+    const { user, cargando, cargandoConfiguracion } = useAuth();
 
-    if (cargando) return <PantallaCarga />;
+    if (cargando || cargandoConfiguracion) return <PantallaCarga />;
 
     if (!user || !id || user.uid !== id) {
         alert("No tienes permiso para ver esta página.");
