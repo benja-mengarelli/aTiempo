@@ -132,148 +132,158 @@ span {
     justify-content: center;
     z-index: 9999;
     pointer-events: all;
+    --carga-acento: var(--primario, #3b82f6);
+    --carga-duracion: 3.6s;
 }
 
-.animacion-carga {
-    position: relative;
+.carga-tarjeta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 32px 44px 28px;
+    border-radius: 28px;
+    background: var(--bg-card);
+    color: var(--texto);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    animation: tarjetaEntra 0.35s ease-out both;
+}
+
+/* ---------- Reloj ---------- */
+.reloj {
     width: 120px;
     height: 120px;
 }
 
-.cuadrado {
-    position: absolute;
-    inset: 0;
-    border-radius: 25px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
+.reloj-svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.reloj-pista {
+    fill: none;
+    stroke: var(--texto);
+    stroke-opacity: 0.12;
+    stroke-width: 4;
+}
+
+.reloj-progreso {
+    fill: none;
+    stroke: var(--carga-acento);
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-dasharray: 327;
+    stroke-dashoffset: 327;
+    transform: rotate(-90deg);
+    transform-origin: 60px 60px;
+    animation: llenarReloj var(--carga-duracion) linear infinite;
+}
+
+.reloj-marca {
+    stroke: var(--texto);
+    stroke-opacity: 0.3;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+}
+
+.reloj-marca-fuerte {
+    stroke-opacity: 0.6;
+    stroke-width: 2.5;
+}
+
+.reloj-aguja {
+    stroke: var(--texto);
+    stroke-width: 3;
+    stroke-linecap: round;
+    transform-origin: 60px 60px;
+    animation: girarAguja var(--carga-duracion) linear infinite;
+}
+
+.reloj-centro {
+    fill: var(--carga-acento);
+}
+
+/* ---------- Textos ---------- */
+.carga-marca {
+    font-weight: 700;
+    font-size: 18px;
     letter-spacing: 0.5px;
-    color: var(--texto);
-    background: var(--bg);
-    backdrop-filter: blur(6px);
 }
 
-.cuadrado-a {
-    animation: pulsoRotacion 1.6s ease-in-out infinite;
+.carga-mensaje {
+    margin: 0;
+    min-height: 1.2em;
+    font-size: 13px;
+    opacity: 0.65;
+    animation: mensajeEntra 0.4s ease-out both;
 }
 
-.cuadrado-b {
-    transform: rotate(-45deg);
-    background: var(--bg-card);
-    animation: pulsoRotacion-b 1.6s ease-in-out infinite;
+/* ---------- Barra de jornada ---------- */
+.carga-jornada {
+    display: flex;
+    gap: 4px;
+    width: 160px;
+    margin-top: 2px;
 }
 
-.cuadrado-a span {
-    font-size: 14px;
-    animation: pulsoTexto 1.6s ease-in-out infinite;
+.tramo {
+    height: 6px;
+    border-radius: 999px;
+    background: var(--carga-acento);
+    opacity: 0.2;
+    animation: encenderTramo 2.4s ease-in-out infinite;
 }
 
-.cuadrado-b span {
-    transform: rotate(-180deg);
-    font-size: 14px;
-    opacity: 0.5;
-    animation: pulsoTexto-b 1.6s ease-in-out infinite;
+.tramo-entrada  { flex: 4;   animation-delay: 0s; }
+.tramo-descanso { flex: 1.5; animation-delay: 0.8s; background: var(--texto); }
+.tramo-salida   { flex: 4;   animation-delay: 1.6s; }
+
+/* ---------- Keyframes ---------- */
+@keyframes llenarReloj {
+    0%   { stroke-dashoffset: 327;  opacity: 1; }
+    90%  { stroke-dashoffset: 32.7; opacity: 1; }
+    100% { stroke-dashoffset: 0;    opacity: 0; }
 }
 
-@keyframes pulsoRotacion {
-    0% {
-        transform: scale(1) rotate(0deg);
-        opacity: 1;
-        border-radius: 25px;
-    }
-
-    25% {
-        transform: scale(1.2) rotate(90deg);
-        opacity: 0.75;
-        border-radius: 25px 15px 15px 15px;
-    }
-
-    50% {
-        transform: scale(1) rotate(180deg);
-        opacity: 0.5;
-        border-radius: 25px 15px 25px 15px;
-    }
-
-    75% {
-        transform: scale(0.8) rotate(270deg);
-        opacity: 0.75;
-        border-radius: 25px 25px 25px 15px;
-    }
-
-    100% {
-        transform: scale(1) rotate(360deg);
-        opacity: 1;
-        border-radius: 25px;
-    }
+@keyframes girarAguja {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
 }
 
-@keyframes pulsoRotacion-b {
-    0% {
-        transform: scale(1) rotate(-45deg);
-        opacity: 0.5;
-        border-radius: 25px;
-    }
-
-    25% {
-        transform: scale(0.8) rotate(-135deg);
-        opacity: 0.75;
-        border-radius: 15px 25px 15px 15px;
-    }
-
-    50% {
-        transform: scale(1) rotate(-225deg);
-        opacity: 1;
-        border-radius: 15px 25px 15px 25px;
-    }
-
-    75% {
-        transform: scale(1.2) rotate(-315deg);
-        opacity: 0.75;
-        border-radius: 25px 15px 25px 25px;
-    }
-
-    100% {
-        transform: scale(1) rotate(-405deg);
-        opacity: 0.5;
-        border-radius: 25px;
-    }
+@keyframes encenderTramo {
+    0%, 100% { opacity: 0.2; transform: scaleY(1); }
+    25%, 45% { opacity: 1;   transform: scaleY(1.4); }
+    70%      { opacity: 0.2; transform: scaleY(1); }
 }
 
-@keyframes pulsoTexto {
-    0% {
-        transform: scale(1) rotate(0deg);
-        opacity: 1;
-    }
-
-    50% {
-        transform: rotate(180deg) scale(1.05);
-        opacity: 0.5;
-    }
-
-    100% {
-        transform: rotate(360deg) scale(0.9);
-        opacity: 0.1;
-    }
+@keyframes tarjetaEntra {
+    from { opacity: 0; transform: scale(0.94) translateY(8px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 
-@keyframes pulsoTexto-b {
-    0% {
-        transform: rotate(-45deg) scale(1.05);
-        opacity: 0.1;
-    }
-
-    50% {
-        transform: rotate(-225deg) scale(1.05);
-        opacity: 0.5;
-    }
-
-    100% {
-        transform: rotate(-405deg) scale(0.9);
-        opacity: 1;
-    }
+@keyframes mensajeEntra {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 0.65; transform: translateY(0); }
 }
 
+/* ---------- Accesibilidad ---------- */
+@media (prefers-reduced-motion: reduce) {
+    .reloj-aguja,
+    .tramo,
+    .carga-tarjeta {
+        animation: none;
+    }
+
+    .reloj-progreso {
+        animation: none;
+        stroke-dashoffset: 90;
+    }
+
+    .tramo {
+        opacity: 0.6;
+    }
+}
 
 
 /*! LOGIN CSS  */
@@ -301,6 +311,18 @@ span {
     box-shadow: var(--glass-shadow);
     border-radius: 40px;
     font-size: 16px;
+}
+
+.modal-caja .header-login {
+    display: flex;
+    justify-content: space-between;
+    color: var(--texto);
+}
+.header-login button {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
 }
 
 .modal-caja input {
@@ -354,6 +376,7 @@ span {
     border: none;
     border-radius: 6px;
     cursor: pointer;
+    font-weight: bold;
 }
 
 .error {
@@ -367,6 +390,94 @@ span {
     cursor: pointer;
     text-align: center;
 }
+
+/*! Pantalla empresas  */
+.pantalla-empresas {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.pantalla-empresas h2 {
+    color: var(--texto);
+}
+
+.pantalla-empresas .empresas {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 100%;
+    color: var(--texto);
+    min-height: 250px;
+    background: var(--bg-card);
+}
+
+.pantalla-empresas .empresas .lista-empresas {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+}
+
+.pantalla-empresas .empresas ul li{
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 150px;
+    height: 150px;
+    border-radius: 20px;
+
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    --webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--texto);
+    box-shadow: 20px 20px 20px rgba(0, 0, 0, 0.2);
+}
+.pantalla-empresas .empresas ul li button {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--texto);
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+.pantalla-empresas .empresas ul li:hover {
+    box-shadow: 0 0 10px var(--primario);
+    border-radius: 20px;
+    transition: box-shadow 0.8s ease-in-out;
+    transform: scale(1.15);
+}
+
+.pantalla-empresas .codigos{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    margin-top: 20px;
+    
+    min-height: 200px;
+    width: 100%;
+    background: var(--bg-card);
+}
+.pantalla-empresas .codigos .generar-codigo
+.pantalla-empresas .codigos .ingresar-codigo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: 10px;
+}
+
 
 /*! Pagina user */
 .manejo-jornada {

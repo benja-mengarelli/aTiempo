@@ -66,79 +66,88 @@ export default function PantallaEmpresas() {
 
     return (
         <div className="pantalla-empresas">
-            <h2>Tus empresas</h2>
 
-            {empresas.length === 0 ? (
-                <p>Todavía no pertenecés a ninguna empresa.</p>
-            ) : (
-                <ul className="lista-empresas">
-                    {empresas.map((e) => (
-                        <li key={e.id}>
-                            <button onClick={() => redirectToEmpresa(e.id)}>
-                                {e.nombre}
-                            </button>
-                        </li>
-                    ))}
-                </ul>
-            )}
+            <div className="empresas">
+                <h2>Tus empresas</h2>
 
-            <section className="ingresar-codigo">
-                <h3>¿Tenés un código?</h3>
-                <form onSubmit={handleCanjear}>
-                    <input
-                        type="text"
-                        value={codigoInput}
-                        onChange={(e) => setCodigoInput(e.target.value)}
-                        placeholder="Ingresá el código"
-                        disabled={canjeando}
-                        required
-                    />
-                    <button type="submit" disabled={canjeando}>
-                        {canjeando ? "Procesando..." : "Ingresar"}
-                    </button>
-                </form>
-                {errorCanje && <p className="error">{errorCanje}</p>}
+                {empresas.length === 0 ? (
+                    <p>Todavía no pertenecés a ninguna empresa.</p>
+                ) : (
+                    <ul className="lista-empresas">
+                        {empresas.map((e) => (
+                            <li key={e.id}>
+                                <button onClick={() => redirectToEmpresa(e.id)}>
+                                    {e.nombre}
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
+
+            <section className="codigos">
+
+
+                <div className="ingresar-codigo">
+                    <h3>¿Tenés un código?</h3>
+                    <form onSubmit={handleCanjear}>
+                        <input
+                            type="text"
+                            value={codigoInput}
+                            onChange={(e) => setCodigoInput(e.target.value)}
+                            placeholder="Ingresá el código"
+                            disabled={canjeando}
+                            required
+                        />
+                        <button type="submit" disabled={canjeando}>
+                            {canjeando ? "Procesando..." : "Ingresar"}
+                        </button>
+                    </form>
+                    {errorCanje && <p className="error">{errorCanje}</p>}
+                </div>
+
+                {empresasAdmin.length > 0 && (
+                    <div className="generar-codigo">
+                        <h3>Invitar a un usuario</h3>
+
+                        {empresasAdmin.length > 1 && (
+                            <select
+                                value={empresaParaCodigo}
+                                onChange={(e) => setEmpresaParaCodigo(e.target.value)}
+                            >
+                                {empresasAdmin.map((e) => (
+                                    <option key={e.id} value={e.id}>{e.nombre}</option>
+                                ))}
+                            </select>
+                        )}
+
+                        <button onClick={handleGenerarCodigo} disabled={generando}>
+                            {generando ? "Generando..." : "Generar código"}
+                        </button>
+                        {errorGenerar && <p className="error">{errorGenerar}</p>}
+                        {ultimoCodigoGenerado && (
+                            <p className="codigo-generado">
+                                Código para compartir: <strong>{ultimoCodigoGenerado}</strong>
+                            </p>
+                        )}
+
+                        <h4>Códigos generados</h4>
+                        {codigos.length === 0 ? (
+                            <p>Todavía no generaste ningún código.</p>
+                        ) : (
+                            <ul className="lista-codigos">
+                                {codigos.map((c) => (
+                                    <li key={c.id}>
+                                        {empresaParaCodigo}-{c.id} — {c.usado ? "Usado" : "Sin usar"}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+                )}
             </section>
 
-            {empresasAdmin.length > 0 && (
-                <section className="generar-codigo">
-                    <h3>Invitar a un usuario</h3>
 
-                    {empresasAdmin.length > 1 && (
-                        <select
-                            value={empresaParaCodigo}
-                            onChange={(e) => setEmpresaParaCodigo(e.target.value)}
-                        >
-                            {empresasAdmin.map((e) => (
-                                <option key={e.id} value={e.id}>{e.nombre}</option>
-                            ))}
-                        </select>
-                    )}
-
-                    <button onClick={handleGenerarCodigo} disabled={generando}>
-                        {generando ? "Generando..." : "Generar código"}
-                    </button>
-                    {errorGenerar && <p className="error">{errorGenerar}</p>}
-                    {ultimoCodigoGenerado && (
-                        <p className="codigo-generado">
-                            Código para compartir: <strong>{ultimoCodigoGenerado}</strong>
-                        </p>
-                    )}
-
-                    <h4>Códigos generados</h4>
-                    {codigos.length === 0 ? (
-                        <p>Todavía no generaste ningún código.</p>
-                    ) : (
-                        <ul className="lista-codigos">
-                            {codigos.map((c) => (
-                                <li key={c.id}>
-                                    {empresaParaCodigo}-{c.id} — {c.usado ? "Usado" : "Sin usar"}
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                </section>
-            )}
         </div>
     );
 }

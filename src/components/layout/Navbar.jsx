@@ -41,7 +41,7 @@ export default function Navbar() {
                 <button onClick={handleThemeToggle} aria-label="Cambiar tema">
                     {darkMode ? "🌙" : "☀️"}
                 </button>
-                <button onClick={() => { logout(); }}><Link to="/">✖️Salir</Link></button>
+                <button onClick={() => { logout(); }}><Link to="/login">✖️Salir</Link></button>
             </nav>
         </div>
     );

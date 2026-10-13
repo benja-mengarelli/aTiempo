@@ -54,7 +54,10 @@ export default function LoginPopUp() {
     return (
         <div className="modal-fondo">
             <div className="modal-caja">
-                <h2>{modoRegistro ? "Registrarse" : "Iniciar Sesión"} <button onClick={redirectToLanding}>X</button></h2>
+                <div className="header-login">
+                    <h2>{modoRegistro ? "Registrarse" : "Iniciar Sesión"}</h2>
+                    <button onClick={redirectToLanding}>❌</button>
+                </div>
 
                 <form onSubmit={handleSubmit}>
                     {modoRegistro && (

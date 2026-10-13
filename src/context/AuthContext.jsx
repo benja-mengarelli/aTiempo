@@ -36,7 +36,8 @@ export const AuthProvider = ({ children }) => {
                     // Resolvemos la empresa activa EN LA MISMA PASADA (no en un
                     // efecto separado), para que cargando no baje a false hasta
                     // que rolActual/empresaActivaId también estén listos.
-                    if (listaEmpresas.length === 0) {
+                    
+                   /*  if (listaEmpresas.length === 0) {
                         setEmpresaActivaId(null);
                     } else if (listaEmpresas.length === 1) {
                         setEmpresaActivaId(listaEmpresas[0].id);
@@ -44,7 +45,7 @@ export const AuthProvider = ({ children }) => {
                         const guardada = localStorage.getItem(`empresaActiva:${user.uid}`);
                         const sigueSiendoValida = listaEmpresas.some((e) => e.id === guardada);
                         setEmpresaActivaId(sigueSiendoValida ? guardada : null);
-                    }
+                    } */
                 } else {
                     setUser(null);
                     setDatos(null);

@@ -44,7 +44,7 @@ export default function Admin() {
                     .filter(u => u.activo !== false) //! Ya no haria falta el filtro
                     .map((u) => (
                         <div key={u.id} className="usuario-card">
-                            <Link to={`/admin/${u.id}`} className="usuario-item" >
+                            <Link to={`/empresas/${empresaActivaId}/admin/verHoras/${u.id}`} className="usuario-item" >
                                 <img src={u.imagen} alt={u.nombre} />
                             </Link>
 
