@@ -1,5 +1,5 @@
 import { Navigate, useNavigate } from "react-router-dom";
-import {useAuth} from "../../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import PantallaCarga from "../layout/PantallaCarga";
 
 export default function Landing() {
@@ -19,10 +19,22 @@ export default function Landing() {
 
     //! LANDING VA A RENDERIZAR COMPONENTES Y EL BOTON UNICAMENTE
     return (
-        <div className="landing-container">
-            <h1>Bienvenido a la aplicación de gestión de horas</h1>
-            <p>Por favor, inicie sesión para continuar.</p>
-            <button onClick={redirectToLogin}>Iniciar sesión</button>
-        </div>
+        <main className="landing">
+            <section className="landing-hero">
+                <span className="landing-badge">Control de jornadas</span>
+                <h1>Gestioná las horas de tu equipo <span className="grad">sin vueltas</span></h1>
+                <p>Fichá entrada y salida desde cualquier dispositivo, pedí correcciones y
+                    seguí las métricas de cada empresa en un solo lugar.</p>
+                <div className="landing-cta">
+                    <button className="btn btn-primario" onClick={redirectToLogin}>Inicias Sesion / Registrarse</button>
+                </div>
+            </section>
+
+            <section className="landing-features">
+                <article className="glass feature"><span>⏱️</span><h3>Fichaje en tiempo real</h3><p>Sincronizado entre dispositivos.</p></article>
+                <article className="glass feature"><span>📝</span><h3>Peticiones</h3><p>Pedí altas, ediciones o bajas de jornadas.</p></article>
+                <article className="glass feature"><span>📊</span><h3>Métricas</h3><p>Totales y reportes para admins.</p></article>
+            </section>
+        </main>
     );
 }

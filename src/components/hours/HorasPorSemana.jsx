@@ -1,36 +1,17 @@
-import React from 'react';
+import HeaderRegistro from "./HeaderRegistro";
+import PanelJornadas from "./PanelJornadas";
 
 export default function HorasPorSemana({ semanas, rolActual, abrirForm, eliminarJornada }) {
+    const esAdmin = rolActual === "admin";
+    const lista = [semanas.semana1, semanas.semana2, semanas.semana3, semanas.semana4];
+
     return (
-        <div className={rolActual === "admin"? "registro-por-semana admin" : "registro-por-semana usuario"}>
-            <div className='header-registro'>
-                <h3>Registros por semana</h3>
-                {rolActual === "admin" && <button onClick={abrirForm} className='btn-agregar-jornada'>Agregar jornada </button>}
-            </div>
-            <div className='grid-semanal'>
-                {[semanas.semana1, semanas.semana2, semanas.semana3, semanas.semana4].map((semana, idx) => (
-                    <div key={idx} className='contenedor-grid-semanal'>
-                        <h4>Semana {idx + 1} (Días {semana.dias}) - Total: {semana.total}</h4>
-                        {semana.horas.length === 0 ? (
-                            <p>No hay registros.</p>
-                        ) : (
-                            <ul>
-                                {semana.horas.map((h) => (
-                                    <li key={h.id}>
-                                        <div style={{ backgroundColor: h.mensaje == "ubicacion correcta" ? "var(--secundario)" : h.mensaje == "jornada agregada" ? "var(--medio)" : "var(--incorrecto)" }}>
-                                            <strong>{h.fechaCorta}</strong> - {h.inicio} a {h.fin} ({h.duracion})
-                                            <br />
-                                            <small>{h.mensaje}</small>
-                                        </div>
-                                        {rolActual === "admin" &&
-                                            <button onClick={() => eliminarJornada(h.id)}>
-                                                ⛔
-                                            </button>}
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </div>
+        <div className="registro">
+            <HeaderRegistro titulo="Registros por semana" esAdmin={esAdmin} abrirForm={abrirForm} />
+            <div className="grid-paneles">
+                {lista.map((s, idx) => (
+                    <PanelJornadas key={idx} titulo={`Semana ${idx + 1}`} subtitulo={`Días ${s.dias}`}
+                        total={s.total} horas={s.horas} esAdmin={esAdmin} eliminarJornada={eliminarJornada} />
                 ))}
             </div>
         </div>

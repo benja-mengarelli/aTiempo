@@ -8,6 +8,11 @@ import FormAgregarJornada from '../admin/FormAgregarJornada';
 import PantallaCarga from '../layout/PantallaCarga';
 import CardsResumen from '../graficos/CardsResumen';
 
+const VISTAS = [
+    { id: "mes", label: "Mes" },
+    { id: "15dias", label: "15 días" },
+    { id: "semanas", label: "Semana" },
+];
 
 export default function HoursViewer({ userId, initialMonth, initialView }) {
     const {
@@ -37,93 +42,52 @@ export default function HoursViewer({ userId, initialMonth, initialView }) {
     if (error) {
         return (
             <div className="mis-horas">
-                <p style={{ color: "red" }}>
+                <div className="aviso-error glass">
                     Ocurrió un error al cargar las jornadas: {error.message || String(error)}
-                </p>
+                </div>
             </div>
         );
     }
 
-    return (
+    const indiceVista = VISTAS.findIndex((v) => v.id === tipoVisualizacion);
 
+    return (
         <div className="mis-horas">
             <div className="filtros">
-                <div className="visualizacion-fechas">
-                    {meses.map(m => (
-                        <button
-                            key={m.value}
-                            onClick={() => setMes(m.value)}
-                            style={{
-                                backgroundColor: mes === m.value ? "var(--primario)" : "#ddd",
-                                color: mes === m.value ? "white" : "black",
-                                transform: mes === m.value ? "scale(1.1)" : "none",
-                            }}
-                        >
+                <div className="selector-meses">
+                    {meses.map((m) => (
+                        <button key={m.value} className={`pill ${mes === m.value ? "activo" : ""}`}
+                            onClick={() => setMes(m.value)}>
                             {m.label}
                         </button>
                     ))}
                 </div>
 
-                {/* visualizacion */}
-                <div className="visualizacion-horas">
-                    <button
-                        onClick={() => setTipoVisualizacion("mes")}
-                        style={{
-                            backgroundColor: tipoVisualizacion === "mes" ? "var(--primario)" : "#ddd",
-                            color: tipoVisualizacion === "mes" ? "white" : "black",
-                            transform: tipoVisualizacion === "mes" ? "scale(1.1)" : "none"
-                        }}
-                    >
-                        Mes
-                    </button>
-                    <button
-                        onClick={() => setTipoVisualizacion("15dias")}
-                        style={{
-                            backgroundColor: tipoVisualizacion === "15dias" ? "var(--primario)" : "#ddd",
-                            color: tipoVisualizacion === "15dias" ? "white" : "black",
-                            transform: tipoVisualizacion === "15dias" ? "scale(1.1)" : "none"
-                        }}
-                    >
-                        15 Días
-                    </button>
-                    <button
-                        onClick={() => setTipoVisualizacion("semanas")}
-                        style={{
-                            backgroundColor: tipoVisualizacion === "semanas" ? "var(--primario)" : "#ddd",
-                            color: tipoVisualizacion === "semanas" ? "white" : "black",
-                            transform: tipoVisualizacion === "semanas" ? "scale(1.1)" : "none"
-                        }}
-                    >
-                        Semana
-                    </button>
+                <div className="segmentado" style={{ "--i": indiceVista, "--n": VISTAS.length }}>
+                    <span className="segmentado-thumb" />
+                    {VISTAS.map((v) => (
+                        <button key={v.id}
+                            className={`segmentado-btn ${tipoVisualizacion === v.id ? "activo" : ""}`}
+                            onClick={() => setTipoVisualizacion(v.id)}>
+                            {v.label}
+                        </button>
+                    ))}
                 </div>
-
             </div>
-            <div>
-                {tipoVisualizacion === 'mes' && (
-                    <HorasPorMes
-                        filtradas={filtradas}
-                        total={total}
-                        rolActual={rolActual}
-                        abrirForm={abrirForm}
-                        eliminarJornada={eliminarJornada}
-                    />
+
+            {/* key: re-monta y dispara el fade al cambiar de vista */}
+            <div className="vista-horas" key={tipoVisualizacion}>
+                {tipoVisualizacion === "mes" && (
+                    <HorasPorMes filtradas={filtradas} total={total} rolActual={rolActual}
+                        abrirForm={abrirForm} eliminarJornada={eliminarJornada} />
                 )}
-                {tipoVisualizacion === '15dias' && (
-                    <HorasPor15Dias
-                        agrupadas={agrupadas}
-                        rolActual={rolActual}
-                        abrirForm={abrirForm}
-                        eliminarJornada={eliminarJornada}
-                    />
+                {tipoVisualizacion === "15dias" && (
+                    <HorasPor15Dias agrupadas={agrupadas} rolActual={rolActual}
+                        abrirForm={abrirForm} eliminarJornada={eliminarJornada} />
                 )}
-                {tipoVisualizacion === 'semanas' && (
-                    <HorasPorSemana
-                        semanas={semanas}
-                        rolActual={rolActual}
-                        abrirForm={abrirForm}
-                        eliminarJornada={eliminarJornada}
-                    />
+                {tipoVisualizacion === "semanas" && (
+                    <HorasPorSemana semanas={semanas} rolActual={rolActual}
+                        abrirForm={abrirForm} eliminarJornada={eliminarJornada} />
                 )}
             </div>
 
@@ -131,12 +95,7 @@ export default function HoursViewer({ userId, initialMonth, initialView }) {
                 <CardsResumen jornadas={filtradas} />
             </div>
 
-            {mostrarForm && (
-                <FormAgregarJornada
-                    guardar={guardarJornada}
-                    cerrar={cerrarForm}
-                />
-            )}
+            {mostrarForm && <FormAgregarJornada guardar={guardarJornada} cerrar={cerrarForm} />}
         </div>
     );
 }

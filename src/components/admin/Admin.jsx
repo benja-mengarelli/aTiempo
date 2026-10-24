@@ -6,12 +6,14 @@ import PantallaCarga from "../layout/PantallaCarga";
 import { useState } from "react";
 import PantallaPeticiones from "./PantallaPeticiones";
 import { bulk_aprobarPeticiones, bulk_eliminarPeticiones } from "../../services/peticiones.service";
+import ModalInvitar from "./ModalInvitar";
 
 export default function Admin() {
-    const { user, rolActual, empresaActivaId, cargando: cargandoAuth } = useAuth();
+    const { user, rolActual, empresaActivaId, empresas, cargando: cargandoAuth } = useAuth();
     const { usuarios, cargando: cargandoUsuarios, eliminarUsuario } = useUsuarios(empresaActivaId);
     const { peticiones, total: totalPeticiones } = usePeticionesAdmin(empresaActivaId);
     const [mostrarPeticiones, setMostrarPeticiones] = useState(false);
+    const [mostrarInvitar, setMostrarInvitar] = useState(false);
 
     if (cargandoAuth) return <PantallaCarga />;
 
@@ -22,12 +24,21 @@ export default function Admin() {
 
     if (cargandoUsuarios) return <PantallaCarga />;
 
+    const nombreEmpresa = empresas.find((e) => e.id === empresaActivaId)?.nombre || "";
+
+    const handleEliminar = (u) => {
+        if (window.confirm(`¿Eliminar a ${u.nombre}?`)) eliminarUsuario(u.id);
+    };
+
     return (
         <div className="Pantalla-admin-principal">
+            <div className="admin-toolbar">
+                <h2 className="titulo-pantalla">Equipo</h2>
+                <button onClick={() => setMostrarPeticiones(true)} className="btn btn-glass boton-peticiones">
+                    Peticiones <span className="badge">{totalPeticiones}</span>
+                </button>
+            </div>
 
-            <button onClick={() => setMostrarPeticiones(true)} className="boton-peticiones">
-                Peticiones<span className="badge">{totalPeticiones}</span>
-            </button>
             {mostrarPeticiones && (
                 <PantallaPeticiones
                     peticiones={peticiones}
@@ -35,25 +46,38 @@ export default function Admin() {
                     onAceptar={(peticion) => bulk_aprobarPeticiones(empresaActivaId, [peticion])}
                     onEliminar={(peticionId) => bulk_eliminarPeticiones(empresaActivaId, [peticionId])}
                     onAceptarTodas={(todas) => bulk_aprobarPeticiones(empresaActivaId, todas)}
-                    onEliminarTodas={(todas) => bulk_eliminarPeticiones(empresaActivaId, todas.map(p => p.id))}
+                    onEliminarTodas={(todas) => bulk_eliminarPeticiones(empresaActivaId, todas.map((p) => p.id))}
                 />
             )}
-            <div className="lista-usuarios">
+
+            <div className="grid-boxes">
                 {usuarios
-                    .filter(u => u.rol === "usuario")
-                    .filter(u => u.activo !== false) //! Ya no haria falta el filtro
+                    .filter((u) => u.rol === "usuario")
+                    .filter((u) => u.activo !== false)
                     .map((u) => (
-                        <div key={u.id} className="usuario-card">
-                            <Link to={`/empresas/${empresaActivaId}/admin/verHoras/${u.id}`} className="usuario-item" >
-                                <img src={u.imagen} alt={u.nombre} />
+                        <article key={u.id} className="box box-usuario glass">
+                            <Link to={`/empresas/${empresaActivaId}/admin/verHoras/${u.id}`} className="box-link">
+                                <div className="box-avatar">{u.nombre?.[0]}</div>
+                                <strong>{u.nombre}</strong>
+                                {u.email && <small>{u.email}</small>}
                             </Link>
-
-                            <h3>{u.nombre}</h3>
-
-                            <button className="eliminar-usuario" onClick={() => eliminarUsuario(u.id)}>⛔</button>
-                        </div>
+                            <button className="box-eliminar" onClick={() => handleEliminar(u)}
+                                aria-label={`Eliminar a ${u.nombre}`} title="Eliminar">
+                                ✖
+                            </button>
+                        </article>
                     ))}
+
+                <button className="box box-agregar" onClick={() => setMostrarInvitar(true)}>
+                    <span className="mas">+</span>
+                    <strong>Agregar usuario</strong>
+                </button>
             </div>
+
+            {mostrarInvitar && (
+                <ModalInvitar empresaId={empresaActivaId} nombreEmpresa={nombreEmpresa}
+                    uid={user.uid} cerrar={() => setMostrarInvitar(false)} />
+            )}
         </div>
     );
 }

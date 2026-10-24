@@ -1,9 +1,16 @@
 import { useState } from "react";
+import Modal from "../layout/Modal";
 
 const ETIQUETAS_TIPO = {
     agregar: "Solicitar jornada",
     editar: "Editar jornada",
     eliminar: "Eliminar jornada",
+};
+
+const CLASE_TIPO = {
+    agregar: "chip-ok",
+    editar: "chip-medio",
+    eliminar: "chip-error",
 };
 
 /**
@@ -41,85 +48,102 @@ export default function PantallaPeticiones({
         }
     };
 
-    // ---------------- Vista detalle (una petición) ----------------
+    // no cerrar (Esc / click afuera) mientras se está guardando
+    const cerrarSeguro = () => { if (!procesando) cerrar(); };
+
+    const confirmarBulk = (accion, verbo) => {
+        if (window.confirm(`¿${verbo} las ${peticiones.length} peticiones?`)) {
+            ejecutar(accion, peticiones);
+        }
+    };
+
+
+    // ---------------- Detalle ----------------
     if (seleccionada) {
+        const p = seleccionada;
         return (
-            <div className="pantalla-peticiones detalle">
-                <div className="box-peticiones">
-
-                    <button onClick={() => setSeleccionada(null)} disabled={procesando} className="volver-peticiones">← Volver</button>
-
-                    <h3>{ETIQUETAS_TIPO[seleccionada.tipo]}</h3>
-                    <p><strong>Solicitado por:</strong> {seleccionada.nombre}</p>
-                    <p><strong>Fecha:</strong> {seleccionada.fecha}</p>
-                    {seleccionada.mensaje && <p><strong>Motivo:</strong> {seleccionada.mensaje}</p>}
-
-                    {seleccionada.payload && (
-                        <div className="detalle-payload">
-                            <p><strong>Inicio:</strong> {seleccionada.payload.inicio}</p>
-                            <p><strong>Fin:</strong> {seleccionada.payload.fin}</p>
-                            <p><strong>Duración:</strong> {seleccionada.payload.duracion}</p>
-                        </div>
-                    )}
-
-                    {error && <p className="error">{error}</p>}
-
-                    <div className="acciones-peticion">
-                        <button
-                            onClick={() => ejecutar(onEliminar, seleccionada.id)}
-                            disabled={procesando}
-                        >
-                            Eliminar esta
-                        </button>
-                        <button
-                            onClick={() => ejecutar(onAceptar, seleccionada)}
-                            disabled={procesando}
-                        >
-                            {procesando ? "Procesando..." : "Aceptar esta"}
-                        </button>
+            <Modal titulo={ETIQUETAS_TIPO[p.tipo]} cerrar={cerrarSeguro} grande>
+                <div className="peticion-quien">
+                    <div className="box-avatar chico">{p.nombre?.[0]}</div>
+                    <div className="peticion-info">
+                        <strong>{p.nombre}</strong>
+                        <small>{p.fecha}</small>
                     </div>
                 </div>
-            </div>
-        );
-    }
 
-    // ---------------- Vista listado ----------------
-    return (
-        <div className="pantalla-peticiones listado">
-            <div className="box-peticiones">
+                {p.mensaje && (
+                    <div className="peticion-motivo">
+                        <small>Motivo</small>
+                        <p>{p.mensaje}</p>
+                    </div>
+                )}
 
-                <div className="header-peticiones">
-                    <h2>Peticiones pendientes ({peticiones.length})</h2>
-                </div>
-
-                {peticiones.length === 0 ? (
-                    <p>No hay peticiones pendientes.</p>
-                ) : (
-                    <>
-                        <div className="acciones-bulk">
-                            <button onClick={() => ejecutar(onEliminarTodas, peticiones)} disabled={procesando}>
-                                Eliminar todas
-                            </button>
-                            <button onClick={() => ejecutar(onAceptarTodas, peticiones)} disabled={procesando}>
-                                {procesando ? "Procesando..." : "Aceptar todas"}
-                            </button>
-                        </div>
-
-                        <ul className="lista-peticiones">
-                            {peticiones.map((p) => (
-                                <li key={p.id} className="fila-peticion">
-                                    <button className="ver-detalle" onClick={() => setSeleccionada(p)}>
-                                        {p.nombre} — {p.fecha} — {ETIQUETAS_TIPO[p.tipo]}
-                                    </button>
-                                </li>
-                            ))}
-                        </ul>
-                    </>
+                {p.payload && (
+                    <div className="peticion-payload">
+                        <div><small>Inicio</small><strong>{p.payload.inicio}</strong></div>
+                        <div><small>Fin</small><strong>{p.payload.fin}</strong></div>
+                        <div><small>Duración</small><strong>{p.payload.duracion}</strong></div>
+                    </div>
                 )}
 
                 {error && <p className="error">{error}</p>}
-                <button onClick={cerrar} disabled={procesando} className="cerrar-peticiones">Cerrar</button>
+
+                <div className="acciones-modal repartidas">
+                    <button className="btn btn-glass" onClick={() => setSeleccionada(null)} disabled={procesando}>
+                        ← Volver
+                    </button>
+                    <div className="grupo">
+                        <button className="btn btn-peligro" onClick={() => ejecutar(onEliminar, p.id)} disabled={procesando}>
+                            Eliminar
+                        </button>
+                        <button className="btn btn-primario" onClick={() => ejecutar(onAceptar, p)} disabled={procesando}>
+                            {procesando ? "Procesando..." : "Aceptar"}
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+        );
+    }
+
+    // ---------------- Listado ----------------
+    return (
+        <Modal titulo={`Peticiones pendientes (${peticiones.length})`} cerrar={cerrarSeguro} grande>
+            {peticiones.length === 0 ? (
+                <p className="vacio">No hay peticiones pendientes ✅</p>
+            ) : (
+                <>
+                    <div className="acciones-modal">
+                        <button className="btn btn-peligro btn-chico" disabled={procesando}
+                            onClick={() => confirmarBulk(onEliminarTodas, "Eliminar")}>
+                            Eliminar todas
+                        </button>
+                        <button className="btn btn-primario btn-chico" disabled={procesando}
+                            onClick={() => confirmarBulk(onAceptarTodas, "Aceptar")}>
+                            {procesando ? "Procesando..." : "Aceptar todas"}
+                        </button>
+                    </div>
+
+                    <div className="lista-peticiones">
+                        {peticiones.map((p) => (
+                            <button key={p.id} className="fila-peticion" onClick={() => setSeleccionada(p)}>
+                                <div className="box-avatar chico">{p.nombre?.[0]}</div>
+                                <div className="peticion-info">
+                                    <strong>{p.nombre}</strong>
+                                    <small>{p.fecha}</small>
+                                </div>
+                                <span className={`chip ${CLASE_TIPO[p.tipo]}`}>{ETIQUETAS_TIPO[p.tipo]}</span>
+                                <span className="flecha">›</span>
+                            </button>
+                        ))}
+                    </div>
+                </>
+            )}
+
+            {error && <p className="error">{error}</p>}
+
+            <div className="acciones-modal">
+                <button className="btn btn-glass" onClick={cerrar} disabled={procesando}>Cerrar</button>
             </div>
-        </div>
+        </Modal>
     );
 }

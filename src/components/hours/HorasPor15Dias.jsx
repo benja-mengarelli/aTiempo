@@ -1,57 +1,17 @@
-import React from 'react';
+import HeaderRegistro from "./HeaderRegistro";
+import PanelJornadas from "./PanelJornadas";
 
 export default function HorasPor15Dias({ agrupadas, rolActual, abrirForm, eliminarJornada }) {
+    const esAdmin = rolActual === "admin";
+
     return (
-        <div className={rolActual === "admin"? "registro-15-dias admin" : "registro-15-dias usuario"}>
-            <div className='header-registro'>
-                <h3>Registros por 15 días</h3>
-                {rolActual === "admin" && <button onClick={abrirForm} className='btn-agregar-jornada'>Agregar jornada </button>}
-            </div>
-            <div className='registro-15-dias-contenedor'>
-                <div className='quincenas'>
-                    <h4>Días 1-15 (Total: {agrupadas.totalPrimera15})</h4>
-                    {agrupadas.primera15.length === 0 ? (
-                        <p>No hay registros.</p>
-                    ) : (
-                        <ul>
-                            {agrupadas.primera15.map((h) => (
-                                <li key={h.id} >
-                                    <div style={{ backgroundColor: h.mensaje == "ubicacion correcta" ? "var(--secundario)" : h.mensaje == "jornada agregada" ? "var(--medio)" : "var(--incorrecto)" }}>
-                                        <strong>{h.fechaCorta}</strong> - {h.inicio} a {h.fin} ({h.duracion})
-                                        <br />
-                                        <small>{h.mensaje}</small>
-                                    </div>
-                                    {rolActual === "admin" &&
-                                        <button onClick={() => eliminarJornada(h.id)}>
-                                            ⛔
-                                        </button>}
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                </div>
-                <div className='quincenas'>
-                    <h4>Días 16-31 (Total: {agrupadas.totalSegunda15})</h4>
-                    {agrupadas.segunda15.length === 0 ? (
-                        <p>No hay registros.</p>
-                    ) : (
-                        <ul>
-                            {agrupadas.segunda15.map((h) => (
-                                <li key={h.id}>
-                                    <div style={{ backgroundColor: h.mensaje == "ubicacion correcta" ? "var(--secundario)" : h.mensaje == "jornada agregada" ? "var(--medio)" : "var(--incorrecto)" }}>
-                                        <strong>{h.fechaCorta}</strong> - {h.inicio} a {h.fin} ({h.duracion})
-                                        <br />
-                                        <small>{h.mensaje}</small>
-                                    </div>
-                                    {rolActual === "admin" &&
-                                        <button onClick={() => eliminarJornada(h.id)}>
-                                            ⛔
-                                        </button>}
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                </div>
+        <div className="registro">
+            <HeaderRegistro titulo="Registros por 15 días" esAdmin={esAdmin} abrirForm={abrirForm} />
+            <div className="grid-paneles">
+                <PanelJornadas titulo="Días 1–15" total={agrupadas.totalPrimera15} horas={agrupadas.primera15}
+                    esAdmin={esAdmin} eliminarJornada={eliminarJornada} />
+                <PanelJornadas titulo="Días 16–31" total={agrupadas.totalSegunda15} horas={agrupadas.segunda15}
+                    esAdmin={esAdmin} eliminarJornada={eliminarJornada} />
             </div>
         </div>
     );

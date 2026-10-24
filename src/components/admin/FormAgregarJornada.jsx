@@ -2,37 +2,35 @@ import { useState } from "react"
 import { contabilizarHoras, calcularDuracion } from "../../helpers/time.helpers";
 import PantallaCarga from "../layout/PantallaCarga";
 import { Timestamp } from "firebase/firestore";
+import Modal from "../layout/Modal";
+
+
+const aSegundos = (t) => {
+    if (!t) return 0;
+    const [h = 0, m = 0, s = 0] = t.split(":").map(Number);
+    return h * 3600 + m * 60 + s;
+};
 
 const FormAgregarJornada = ({ cerrar, guardar }) => {
     const [fecha, setFecha] = useState("");
     const [inicio, setInicio] = useState("");
     const [fin, setFin] = useState("");
     const [error, setError] = useState("");
-    const [cargando, setCargando] =useState(false)
+    const [cargando, setCargando] = useState(false)
 
     const calcularDuracion = () => {
-        const parseTime = (t) => {
-            if (!t) return 0;
-            const parts = t.split(":").map(Number);
-            let h = parts[0] || 0;
-            let m = parts[1] || 0;
-            let s = parts[2] || 0;
-            return h * 3600 + m * 60 + s;
-        };
-
-        let inicial = parseTime(inicio);
-        let final = parseTime(fin);
-
-        if (final <= inicial) {
-            final += 24 * 3600;
-        }
-
+        const inicial = aSegundos(inicio);
+        let final = aSegundos(fin);
+        if (final <= inicial) final += 24 * 3600; // cruza medianoche
         return contabilizarHoras(final - inicial);
-    }
+    };
+
+    const hayRango = Boolean(inicio && fin);
+    const duracionPreview = hayRango ? calcularDuracion() : null;
+    const cruzaMedianoche = hayRango && aSegundos(fin) <= aSegundos(inicio);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setCargando(true)
         setError("");
 
         if (!fecha || !inicio || !fin) {
@@ -40,30 +38,26 @@ const FormAgregarJornada = ({ cerrar, guardar }) => {
             return;
         }
 
-        const duracion = calcularDuracion()
+        setCargando(true);
 
-        if (duracion === null) {
-            setError("Inicio debe ser mayor que final")
-            setCargando(false); 
-            return;
-        }
-
-        const expiracion = new Date(fecha);
-        expiracion.setMonth(expiracion.getMonth() + 6)
-        expiracion.setDate(1)
+        const dia = new Date(`${fecha}T12:00:00`);
+        const expiracion = new Date(dia);
+        expiracion.setMonth(expiracion.getMonth() + 6);
+        expiracion.setDate(1);
 
         const payload = {
             fecha,
-            diaSemana: new Date(fecha).toLocaleDateString("es-AR", { weekday: "long", timeZone: "America/Argentina/Cordoba" }),
-            numeroDia: new Date(fecha).getDate(),
-            numeroDiaSemana: new Date(fecha).getDay(),
+            diaSemana: dia.toLocaleDateString("es-AR", { weekday: "long", timeZone: "America/Argentina/Cordoba" }),
+            numeroDia: dia.getDate(),
+            numeroDiaSemana: dia.getDay(),
             activo: false,
             expiracion: Timestamp.fromDate(expiracion),
             inicio,
             fin,
-            duracion,
+            duracion: calcularDuracion(),
             mensaje: "jornada agregada",
-        }
+        };
+
 
         try {
             await guardar(payload);
@@ -75,57 +69,50 @@ const FormAgregarJornada = ({ cerrar, guardar }) => {
         }
     }
 
-    if (cargando) return <PantallaCarga />
-
     return (
-        <div className="modal-jornada">
-            <form onSubmit={handleSubmit}>
-                <h3>Nueva jornada</h3>
+        <Modal titulo="Nueva jornada" cerrar={() => { if (!cargando) cerrar(); }}>
+            <form onSubmit={handleSubmit} className="form-modal">
+                <label className="campo">
+                    <span>Fecha</span>
+                    <input className="input" type="date" value={fecha} required
+                        onChange={(e) => setFecha(e.target.value)} />
+                </label>
 
-                <div className="modal-jornada-labels">
-                    <label>
-                        Fecha
-                        <input
-                            type="date"
-                            value={fecha}
-                            onChange={(e) => setFecha(e.target.value)}
-                            required
-                        />
+                <div className="campos-fila">
+                    <label className="campo">
+                        <span>Inicio</span>
+                        <input className="input" type="time" step="1" value={inicio} required
+                            onChange={(e) => setInicio(e.target.value)} />
                     </label>
-
-                    <label>
-                        Inicio
-                        <input
-                            type="time"
-                            step="1"
-                            value={inicio}
-                            onChange={(e) => setInicio(e.target.value)}
-                            required
-                        />
+                    <label className="campo">
+                        <span>Fin</span>
+                        <input className="input" type="time" step="1" value={fin} required
+                            onChange={(e) => setFin(e.target.value)} />
                     </label>
-
-                    <label>
-                        Fin
-                        <input
-                            type="time"
-                            step="1"
-                            value={fin}
-                            onChange={(e) => setFin(e.target.value)}
-                            required
-                        />
-                    </label>
-
-                    {error && <p style={{ color: "red" }}>{error}</p>}
                 </div>
 
+                {duracionPreview && (
+                    <div className="duracion-preview">
+                        <span>Duración</span>
+                        <strong>{duracionPreview}</strong>
+                        {cruzaMedianoche && <small>Termina al día siguiente</small>}
+                    </div>
+                )}
 
-                <div className="modal-jornada-buttons">
-                    <button type="submit"> Guardar</button>
-                    <button type="button" onClick={cerrar}> Cancelar</button>
+                {error && <p className="error">{error}</p>}
+
+                <div className="acciones-modal">
+                    <button type="button" className="btn btn-glass" onClick={cerrar} disabled={cargando}>
+                        Cancelar
+                    </button>
+                    <button type="submit" className="btn btn-primario" disabled={cargando}>
+                        {cargando ? "Guardando..." : "Guardar"}
+                    </button>
                 </div>
             </form>
-        </div>
+        </Modal>
     );
 };
+
 
 export default FormAgregarJornada;

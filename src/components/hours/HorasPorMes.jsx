@@ -1,43 +1,45 @@
-import React from 'react';
+import HeaderRegistro from "./HeaderRegistro";
+import ChipMensaje from "./ChipMensaje";
+import BotonEliminar from "./BotonEliminar";
 
 export default function HorasPorMes({ filtradas, total, rolActual, abrirForm, eliminarJornada }) {
+    const esAdmin = rolActual === "admin";
+
     return (
-        <div className='registro-por-mes'>
-            <div className='header-registro'>
-                <h3>Registros del mes (total: {total})</h3>
-                {rolActual === "admin" && <button onClick={abrirForm} className='btn-agregar-jornada'><strong>Agregar jornada</strong> </button>}
-            </div>
+        <div className="registro">
+            <HeaderRegistro titulo="Registros del mes" total={total} esAdmin={esAdmin} abrirForm={abrirForm} />
+
             {filtradas.length === 0 ? (
-                <p>No hay registros para este mes.</p>
+                <p className="vacio glass">No hay registros para este mes.</p>
             ) : (
-                <table>
-                    <thead>
-                        <tr>
-                            <th >Fecha</th>
-                            <th >Inicio - Fin</th>
-                            <th >Duración</th>
-                            <th >Mensaje</th>
-                            {rolActual === "admin" && <th>🗑️</th>}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filtradas.map((h) => (
-                            <tr key={h.id} style={{ backgroundColor: "var(--bg-card)" }} >
-                                <td ><strong>{h.fechaCorta}</strong></td>
-                                <td >{h.inicio} - {h.fin}</td>
-                                <td >{h.duracion}</td>
-                                <td style={{ backgroundColor: h.mensaje == "ubicacion correcta" ? "var(--secundario)" : h.mensaje == "jornada agregada" ? "var(--medio)" : "var(--incorrecto)" }}>{h.mensaje}</td>
-                                {rolActual === "admin" &&
-                                <td>
-                                    <button onClick={() => eliminarJornada(h.id)}>
-                                        ⛔
-                                    </button>
-                                </td>
-                                }
+                <div className="tabla-wrap glass">
+                    <table className="tabla">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Inicio – Fin</th>
+                                <th>Duración</th>
+                                <th>Mensaje</th>
+                                {esAdmin && <th aria-label="Acciones" />}
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {filtradas.map((h) => (
+                                <tr key={h.id}>
+                                    <td data-label="Fecha"><strong>{h.fechaCorta}</strong></td>
+                                    <td data-label="Horario">{h.inicio} – {h.fin}</td>
+                                    <td data-label="Duración"><strong>{h.duracion}</strong></td>
+                                    <td data-label="Mensaje"><ChipMensaje mensaje={h.mensaje} /></td>
+                                    {esAdmin && (
+                                        <td data-label="">
+                                            <BotonEliminar onClick={() => eliminarJornada(h.id)} />
+                                        </td>
+                                    )}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             )}
         </div>
     );
