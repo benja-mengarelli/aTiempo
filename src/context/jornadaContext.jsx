@@ -20,7 +20,7 @@ import { useConfiguracionEmpresa } from "../hooks/useConfiguracionEmpresa";
 const JornadaActivaContext = createContext();
 
 export const JornadaActivaProvider = ({ children }) => {
-    const { user, empresaActivaId} = useAuth();
+    const { user, empresaActivaId } = useAuth();
     const { configuracion } = useConfiguracionEmpresa(empresaActivaId);
 
     console.log("empresaActivaId en JornadaActivaProvider:", empresaActivaId);
@@ -129,6 +129,10 @@ export const JornadaActivaProvider = ({ children }) => {
         setProcesando(true);
         try {
 
+            const finTs = Date.now();
+            const inicioReal = jornadaActiva.inicioTimestamp
+                ? jornadaActiva.inicioTimestamp.toMillis()
+                : finTs;
             // Preparamos las props para el calculo de la duracion y 
             //el uso de la geolocalizacion
             const COORDENADAS = {
@@ -136,11 +140,17 @@ export const JornadaActivaProvider = ({ children }) => {
                 longitud: configuracion.longitud
             }
             const distanciaMax = configuracion.rangoMetros;
-            const redondeo = configuracion.reondeoMinutos;
+            const redondeo = configuracion.redondeoMinutos;
             const minimo = configuracion.minimoHS;
             const segundos = (finTs - inicioReal) / 1000;
 
-            const finTs = Date.now();
+            console.log({
+                segundos,
+                redondeo,
+                minimo,
+                tipoRedondeo: typeof redondeo
+            });
+
             const flagFin = await useGeoLocation(COORDENADAS, distanciaMax);
             const contadorUbicacion = Number(jornadaActiva.flagDistanciaInicio || 0) + Number(flagFin || 0);
             const mensaje =
@@ -148,13 +158,10 @@ export const JornadaActivaProvider = ({ children }) => {
                     ? "Ubicacion no permitida"
                     : contadorUbicacion > 0
                         ? `Fuera de rango en ${contadorUbicacion} ocasión(es).`
-                        : "Ubicacion correcta";
+                        : "ubicacion correcta";
 
             // inicioTimestamp viene del propio doc: funciona sin importar
             // desde qué dispositivo se inició la jornada.
-            const inicioReal = jornadaActiva.inicioTimestamp
-                ? jornadaActiva.inicioTimestamp.toMillis()
-                : finTs;
 
             const cambios = {
                 fin: new Date(finTs).toLocaleTimeString(),

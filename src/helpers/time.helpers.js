@@ -21,11 +21,18 @@ export const contabilizarHoras = (segundos, redondeo, minimo) => {
     let hrs = Math.floor(segundos / 3600);
     let mins = Math.floor((segundos % 3600) / 60);
 
-
+    console.log({
+    segundos,
+    redondeo,
+    minimo,
+    tipoRedondeo: typeof redondeo
+});
+    
+    
     // redondeo en base a 0 / 15 /30 mins. 
     // DEVUELVE HORAS EN FORMATO FLOTANTE
     if (redondeo == 0) {
-        hrs += mins / 100;
+        hrs += mins / 60;
     }
 
     if (redondeo == 15) {
@@ -47,7 +54,10 @@ export const contabilizarHoras = (segundos, redondeo, minimo) => {
             hrs += 0.5
         }
     }
-
+    
+    console.log("minutos: ", mins)
+    console.log("hs: ",  hrs)
+    console.log("Segundos:", segundos)
     // Redondeo por cuartos de hora
     return hrs < minimo ? minimo : hrs;
 };

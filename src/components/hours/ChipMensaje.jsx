@@ -1,4 +1,4 @@
-const CLASES = { "ubicacion correcta": "ok", "jornada agregada": "medio" };
+const CLASES = { "ubicacion correcta": "ok", "jornada agregada": "medio", "Ubicacion correcta": "ok" };
 export const claseMensaje = (m) => CLASES[m] ?? "error";
 
 export default function ChipMensaje({ mensaje }) {

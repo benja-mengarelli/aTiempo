@@ -3,7 +3,8 @@ import { contabilizarHoras, calcularDuracion } from "../../helpers/time.helpers"
 import PantallaCarga from "../layout/PantallaCarga";
 import { Timestamp } from "firebase/firestore";
 import Modal from "../layout/Modal";
-
+import { useConfiguracionEmpresa } from "../../hooks/useConfiguracionEmpresa";
+import { useAuth } from "../../context/AuthContext";
 
 const aSegundos = (t) => {
     if (!t) return 0;
@@ -16,18 +17,23 @@ const FormAgregarJornada = ({ cerrar, guardar }) => {
     const [inicio, setInicio] = useState("");
     const [fin, setFin] = useState("");
     const [error, setError] = useState("");
-    const [cargando, setCargando] = useState(false)
+    const [cargando, setCargando] = useState(false);
+    const { empresaActivaId } = useAuth();
+    const { configuracion } = useConfiguracionEmpresa(empresaActivaId);
 
     const calcularDuracion = () => {
         const inicial = aSegundos(inicio);
         let final = aSegundos(fin);
+        const redondeo = configuracion.redondeoMinutos;
+        const minimo = configuracion.minimoHS;
         if (final <= inicial) final += 24 * 3600; // cruza medianoche
-        return contabilizarHoras(final - inicial);
+        return contabilizarHoras(final - inicial, redondeo, minimo);
     };
 
     const hayRango = Boolean(inicio && fin);
     const duracionPreview = hayRango ? calcularDuracion() : null;
     const cruzaMedianoche = hayRango && aSegundos(fin) <= aSegundos(inicio);
+    console.log("calcular duracion:", duracionPreview)
 
     const handleSubmit = async (e) => {
         e.preventDefault();
