@@ -7,11 +7,9 @@ export default function Landing() {
     const navigate = useNavigate();
 
     const redirectToLogin = () => {
-        console.log("Redirigiendo a la página de login...");
         navigate("/login");
     }
-    console.log("Landing.jsx - user:", user);
-    console.log("Landing.jsx - datos:", datos);
+
     if (cargando) return <PantallaCarga />;
 
     if (user && datos?.rol == "superAdmin") return <Navigate to="/superUser" replace />;

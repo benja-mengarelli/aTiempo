@@ -23,9 +23,6 @@ export const JornadaActivaProvider = ({ children }) => {
     const { user, empresaActivaId } = useAuth();
     const { configuracion } = useConfiguracionEmpresa(empresaActivaId);
 
-    console.log("empresaActivaId en JornadaActivaProvider:", empresaActivaId);
-    console.log("configuracion en JornadaActivaProvider:", configuracion);
-
     const [jornadaActiva, setJornadaActiva] = useState(null);
     const [cargando, setCargando] = useState(true);
     const [procesando, setProcesando] = useState(false);
@@ -75,11 +72,11 @@ export const JornadaActivaProvider = ({ children }) => {
         }
 
         const COORDENADAS = {
-            latitud: configuracion.latitud,
-            longitud: configuracion.longitud
+            latitud: configuracion.coordenadas.latitud,
+            longitud: configuracion.coordenadas.longitud
         }
         const distanciaMax = configuracion.rangoMetros
-
+        
         setProcesando(true);
         try {
             const flagInicio = await useGeoLocation(COORDENADAS, distanciaMax);
@@ -133,26 +130,21 @@ export const JornadaActivaProvider = ({ children }) => {
             const inicioReal = jornadaActiva.inicioTimestamp
                 ? jornadaActiva.inicioTimestamp.toMillis()
                 : finTs;
+
             // Preparamos las props para el calculo de la duracion y 
             //el uso de la geolocalizacion
             const COORDENADAS = {
-                latitud: configuracion.latitud,
-                longitud: configuracion.longitud
+                latitud: configuracion.coordenadas.latitud,
+                longitud: configuracion.coordenadas.longitud
             }
             const distanciaMax = configuracion.rangoMetros;
             const redondeo = configuracion.redondeoMinutos;
             const minimo = configuracion.minimoHS;
             const segundos = (finTs - inicioReal) / 1000;
 
-            console.log({
-                segundos,
-                redondeo,
-                minimo,
-                tipoRedondeo: typeof redondeo
-            });
-
             const flagFin = await useGeoLocation(COORDENADAS, distanciaMax);
             const contadorUbicacion = Number(jornadaActiva.flagDistanciaInicio || 0) + Number(flagFin || 0);
+
             const mensaje =
                 contadorUbicacion > 2
                     ? "Ubicacion no permitida"
